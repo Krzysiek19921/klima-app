@@ -1,0 +1,66 @@
+/* ==========================================
+   GŁÓWNE STYLE APLIKACJI I ELEMENTÓW CANVAS
+   ========================================== */
+
+/* Ustawienia interakcji dla obszaru podpisu */
+canvas {
+  touch-action: none; /* Zapobiega przewijaniu strony podczas rysowania na ekranie dotykowym */
+  cursor: crosshair;
+  background-color: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 0.5rem;
+  transition: border-color 0.2s ease-in-out;
+}
+
+canvas:hover, canvas:active {
+  border-color: #3b82f6; /* Zmiana koloru ramki przy najechaniu/rysowaniu */
+}
+
+/* Animacja i ukrywanie sekcji */
+.app-section {
+  transition: opacity 0.15s ease-in-out;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Customowy wygląd suwaków i pól formularzy */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* ==========================================
+   STYLE DLA WIDOKU DRUKU / GENERATORA PDF
+   ========================================== */
+
+@media print {
+  /* Ukryj elementy interfejsu aplikacji podczas drukowania */
+  header, nav, button, .no-print {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 12pt;
+  }
+
+  /* Wymuszenie wyświetlania sekcji protokołu */
+  #sec-print {
+    display: block !important;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .shadow-lg, .shadow-md, .shadow {
+    box-shadow: none !important;
+  }
+
+  .border {
+    border-color: #000000 !important;
+  }
+}

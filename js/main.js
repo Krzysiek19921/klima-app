@@ -23,7 +23,7 @@
     }
   });
 
-  // Dynamiczne dodawanie jednostek wewnętrznych
+  // Dodawanie jednostek wewnętrznych
   let indoorCount = 1;
   const addIndoorBtn = document.getElementById('add-indoor-btn');
   const indoorContainer = document.getElementById('indoor-units-container');
@@ -54,7 +54,7 @@
     });
   }
 
-  // Dynamiczne dodawanie jednostek zewnętrznych
+  // Dodawanie jednostek zewnętrznych
   let outdoorCount = 1;
   const addOutdoorBtn = document.getElementById('add-outdoor-btn');
   const outdoorContainer = document.getElementById('outdoor-units-container');
@@ -85,7 +85,7 @@
     });
   }
 
-  // --- GENEROWANIE DOKUMENTU PDF W UKRYTYM KONTENERZE ---
+  // --- NATYWNE GENEROWANIE DOKUMENTU DO WYDRUKU / ZAPISU DO PDF ---
   const form = document.getElementById('protocol-form');
   if (form) {
     form.addEventListener('submit', (e) => {
@@ -118,14 +118,14 @@
       document.querySelectorAll('#indoor-units-container .card-box').forEach((card, idx) => {
         const model = card.querySelector('.indoor-model')?.value || '-';
         const serial = card.querySelector('.indoor-serial')?.value || '-';
-        indoorHtml += `<tr><td style="border: 1px solid #000; padding: 6px;">JW #${idx + 1}</td><td style="border: 1px solid #000; padding: 6px;">${model}</td><td style="border: 1px solid #000; padding: 6px;">${serial}</td></tr>`;
+        indoorHtml += `<tr><td style="border: 1px solid #000; padding: 5px;">JW #${idx + 1}</td><td style="border: 1px solid #000; padding: 5px;">${model}</td><td style="border: 1px solid #000; padding: 5px;">${serial}</td></tr>`;
       });
 
       let outdoorHtml = '';
       document.querySelectorAll('#outdoor-units-container .card-box').forEach((card, idx) => {
         const model = card.querySelector('.outdoor-model')?.value || '-';
         const serial = card.querySelector('.outdoor-serial')?.value || '-';
-        outdoorHtml += `<tr><td style="border: 1px solid #000; padding: 6px;">JZ #${idx + 1}</td><td style="border: 1px solid #000; padding: 6px;">${model}</td><td style="border: 1px solid #000; padding: 6px;">${serial}</td></tr>`;
+        outdoorHtml += `<tr><td style="border: 1px solid #000; padding: 5px;">JZ #${idx + 1}</td><td style="border: 1px solid #000; padding: 5px;">${model}</td><td style="border: 1px solid #000; padding: 5px;">${serial}</td></tr>`;
       });
 
       const clientCanvas = document.getElementById('client-signature');
@@ -133,31 +133,36 @@
       const clientSigImg = clientCanvas ? clientCanvas.toDataURL() : '';
       const installerSigImg = installerCanvas ? installerCanvas.toDataURL() : '';
 
-      const pdfArea = document.getElementById('pdf-print-area');
-      if (!pdfArea) return;
+      // Pobieramy lub tworzymy element wydruku
+      let printDoc = document.getElementById('print-document');
+      if (!printDoc) {
+        printDoc = document.createElement('div');
+        printDoc.id = 'print-document';
+        document.body.appendChild(printDoc);
+      }
 
-      pdfArea.innerHTML = `
-        <div style="font-family: Arial, sans-serif; font-size: 12px; color: #000; line-height: 1.4;">
+      printDoc.innerHTML = `
+        <div style="font-family: Arial, sans-serif; font-size: 11pt; color: #000; line-height: 1.4;">
           <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px;">
-            <h2 style="margin: 0; font-size: 18px; text-transform: uppercase;">PROTOKÓŁ MONTAŻU / SERWISU KLIMATYZACJI</h2>
-            <p style="margin: 4px 0 0 0; font-size: 11px; color: #333;">Data wykonania usługi: <strong>${serviceDate}</strong></p>
+            <h2 style="margin: 0; font-size: 16pt; text-transform: uppercase;">PROTOKÓŁ MONTAŻU / SERWISU KLIMATYZACJI</h2>
+            <p style="margin: 4px 0 0 0; font-size: 10pt; color: #333;">Data wykonania usługi: <strong>${serviceDate}</strong></p>
           </div>
 
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
             <tr>
               <td style="width: 50%; vertical-align: top; padding-right: 8px;">
-                <div style="border: 1px solid #000; padding: 8px; min-height: 95px;">
-                  <strong style="font-size: 12px; text-decoration: underline;">WYKONAWCA / SERWIS:</strong><br>
-                  <strong style="font-size: 13px;">${companyName}</strong><br>
+                <div style="border: 1px solid #000; padding: 8px; min-height: 90px;">
+                  <strong style="font-size: 11pt; text-decoration: underline;">WYKONAWCA / SERWIS:</strong><br>
+                  <strong style="font-size: 11pt;">${companyName}</strong><br>
                   NIP: ${companyNip}<br>
                   Adres: ${companyAddress}<br>
                   Tel: ${companyPhone} | Email: ${companyEmail}
                 </div>
               </td>
               <td style="width: 50%; vertical-align: top; padding-left: 8px;">
-                <div style="border: 1px solid #000; padding: 8px; min-height: 95px;">
-                  <strong style="font-size: 12px; text-decoration: underline;">ZLECENIODAWCA / KLIENT:</strong><br>
-                  <strong style="font-size: 13px;">${clientName}</strong><br>
+                <div style="border: 1px solid #000; padding: 8px; min-height: 90px;">
+                  <strong style="font-size: 11pt; text-decoration: underline;">ZLECENIODAWCA / KLIENT:</strong><br>
+                  <strong style="font-size: 11pt;">${clientName}</strong><br>
                   Adres montażu: ${clientAddress}<br>
                   Tel: ${clientPhone}
                 </div>
@@ -166,17 +171,17 @@
           </table>
 
           <div style="border: 1px solid #000; padding: 8px; margin-bottom: 12px; background-color: #fafafa;">
-            <strong style="font-size: 11px; text-decoration: underline;">CERTYFIKATY INSTALATORA:</strong><br>
+            <strong style="font-size: 10pt; text-decoration: underline;">CERTYFIKATY INSTALATORA:</strong><br>
             Serwisant: <strong>${installerName}</strong> | F-Gaz indywidualny: <strong>${fgazCert}</strong> | F-Gaz przedsiębiorcy: <strong>${companyFgazCert}</strong>
           </div>
 
           <div style="margin-bottom: 12px;">
-            <strong style="font-size: 12px;">SPECYFIKACJA URZĄDZEŃ:</strong>
+            <strong style="font-size: 11pt;">SPECYFIKACJA URZĄDZEŃ:</strong>
             <table style="width: 100%; border-collapse: collapse; margin-top: 4px;" border="1">
               <thead>
                 <tr style="background-color: #eee;">
                   <th style="width: 20%; padding: 5px; text-align: left; border: 1px solid #000;">Typ</th>
-                  <th style="width: 50%; padding: 5px; text-align: left; border: 1px solid #000;">Model urządzenie</th>
+                  <th style="width: 50%; padding: 5px; text-align: left; border: 1px solid #000;">Model urządzenia</th>
                   <th style="width: 30%; padding: 5px; text-align: left; border: 1px solid #000;">Numer seryjny</th>
                 </tr>
               </thead>
@@ -188,46 +193,34 @@
           </div>
 
           <div style="border: 1px solid #000; padding: 8px; margin-bottom: 12px;">
-            <strong style="font-size: 11px;">PARAMETRY CZYNNIKA CHŁODNICZEGO:</strong><br>
+            <strong style="font-size: 10pt;">PARAMETRY CZYNNIKA CHŁODNICZEGO:</strong><br>
             Rodzaj czynnika: <strong>${refrigerantType}</strong> | Ilość w układzie: <strong>${refrigerantAmount} kg</strong>
           </div>
 
-          <div style="border: 1px solid #000; padding: 8px; margin-bottom: 25px; background-color: #fafafa;">
-            <strong style="font-size: 11px;">OŚWIADCZENIE CRO:</strong><br>
-            <span style="font-size: 10px; color: #222;">${croText} Zleceniodawca oświadcza, że został poinformowany o wymogach prawnych i braku/obowiązku rejestracji w CRO.</span>
+          <div style="border: 1px solid #000; padding: 8px; margin-bottom: 30px; background-color: #fafafa;">
+            <strong style="font-size: 10pt;">OŚWIADCZENIE CRO:</strong><br>
+            <span style="font-size: 9pt; color: #222;">${croText} Zleceniodawca oświadcza, że został poinformowany o wymogach prawnych i obowiązku / braku obowiązku rejestracji w CRO.</span>
           </div>
 
-          <table style="width: 100%; margin-top: 30px;">
+          <table style="width: 100%; margin-top: 40px;">
             <tr>
               <td style="width: 50%; text-align: center; vertical-align: bottom;">
                 ${clientSigImg ? `<img src="${clientSigImg}" style="max-height: 50px; max-width: 180px;"><br>` : ''}
                 _____________________________________<br>
-                <strong style="font-size: 10px;">Podpis Zleceniodawcy (Klienta)</strong>
+                <strong style="font-size: 9pt;">Podpis Zleceniodawcy (Klienta)</strong>
               </td>
               <td style="width: 50%; text-align: center; vertical-align: bottom;">
                 ${installerSigImg ? `<img src="${installerSigImg}" style="max-height: 50px; max-width: 180px;"><br>` : ''}
                 _____________________________________<br>
-                <strong style="font-size: 10px;">Podpis Serwisanta / Instalatora</strong>
+                <strong style="font-size: 9pt;">Podpis Serwisanta / Instalatora</strong>
               </td>
             </tr>
           </table>
         </div>
       `;
 
-      const fileName = `Protokol_${clientName.replace(/[^a-zA-Z0-9]/g, '_')}_${serviceDate}.pdf`;
-
-      const opt = {
-        margin:       [8, 8, 8, 8],
-        filename:     fileName,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      html2pdf().set(opt).from(pdfArea).save().catch(err => {
-        console.error('Błąd generowania PDF:', err);
-        alert('Wystąpił błąd podczas generowania pliku PDF.');
-      });
+      // Wywołanie systemowego okna drukowania / zapisu do PDF
+      window.print();
     });
   }
 });

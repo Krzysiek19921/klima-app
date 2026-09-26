@@ -141,11 +141,6 @@ input:focus, select:focus {
   font-weight: bold;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-add:hover {
-  background-color: #1b5e20;
 }
 
 .card-box {
@@ -188,10 +183,6 @@ input:focus, select:focus {
   cursor: pointer;
 }
 
-.btn-remove:hover {
-  background-color: #b71c1c;
-}
-
 .cro-clause-box {
   background-color: var(--cro-bg);
   border: 1px solid var(--cro-border);
@@ -222,21 +213,9 @@ input:focus, select:focus {
   cursor: pointer;
 }
 
-.radio-label input {
-  margin-top: 3px;
-}
-
 .acknowledgment-check {
   border-top: 1px dashed #d7ccc8;
   padding-top: 12px;
-}
-
-.acknowledgment-check label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: normal;
-  cursor: pointer;
 }
 
 .signatures-grid {
@@ -287,20 +266,31 @@ canvas {
   border-radius: 8px;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(2, 136, 209, 0.3);
-  transition: transform 0.1s, box-shadow 0.2s;
 }
 
-.btn-submit:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(2, 136, 209, 0.4);
+#print-document {
+  display: none;
 }
 
-@media (max-width: 600px) {
-  .form-grid, .signatures-grid {
-    grid-template-columns: 1fr;
+/* REGULACJA WIDOKU PODCZAS GENEROWANIA / DRUKOWANIA PDF */
+@media print {
+  body * {
+    visibility: hidden;
   }
-  
-  .form-group.full-width {
-    grid-column: span 1;
+  #print-document, #print-document * {
+    visibility: visible;
+  }
+  #print-document {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
   }
 }

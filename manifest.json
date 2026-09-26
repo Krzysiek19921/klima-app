@@ -1,22 +1,24 @@
 {
-  "name": "KLIMA-SERWIS Protokoły",
-  "short_name": "KlimaProtokół",
-  "description": "Aplikacja do obsługi protokołów montażu i serwisu klimatyzacji z integracją Home Assistant.",
+  "name": "KLIMA-SERWIS - Protokoły Montażu i Serwisu",
+  "short_name": "KLIMA-SERWIS",
+  "description": "Aplikacja do generowania protokołów montażu i serwisu klimatyzacji w formacie PDF.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#2563eb",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#0288d1",
   "icons": [
     {
-      "src": "https://img.icons8.com/color/192/air-conditioner.png",
+      "src": "css/logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "https://img.icons8.com/color/512/air-conditioner.png",
+      "src": "css/logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

@@ -1,5 +1,16 @@
 let indoorUnitCounter = 0;
 
+// Pomocnicza funkcja zabezpieczająca przed XSS (bezpieczne kodowanie znaków HTML)
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Lucide icons
   try {
@@ -9,8 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. Podpisy Canvas
   setTimeout(() => {
     try {
-      initCanvas('sig-client');
-      initCanvas('sig-tech');
+      if (typeof initCanvas === 'function') {
+        initCanvas('sig-client');
+        initCanvas('sig-tech');
+      }
     } catch (e) { console.warn('Canvas init err:', e); }
   }, 100);
 
@@ -29,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Dodaj pierwszą jednostkę na start
+  // Dodaj pierwszą jednostkę na start, jeśli pojemnik jest pusty
   const container = document.getElementById('indoor-container');
   if (container && container.children.length === 0) {
     addIndoorUnit();
@@ -60,7 +73,7 @@ function addIndoorUnit() {
   indoorUnitCounter++;
   const div = document.createElement('div');
   div.className = 'indoor-row flex gap-2 items-center bg-slate-50 p-2 rounded-lg border border-slate-200';
-  div.id = `indoor-row-${indoorUnitCounter}`;
+  div.id = `indoor-row-${Date.now()}`; // Bezpieczny unikalny ID
   
   div.innerHTML = `
     <span class="font-bold text-xs text-slate-400 w-4 num-label">1.</span>
@@ -95,53 +108,71 @@ function reindexIndoorUnits() {
 
 function populateSettingsForm() {
   if (typeof loadSettings !== 'function') return;
-  const s = loadSettings();
-  if (document.getElementById('set-company-name')) document.getElementById('set-company-name').value = s.name || '';
-  if (document.getElementById('set-company-nip')) document.getElementById('set-company-nip').value = s.nip || '';
-  if (document.getElementById('set-company-address')) document.getElementById('set-company-address').value = s.address || '';
-  if (document.getElementById('set-company-contact')) document.getElementById('set-company-contact').value = s.contact || '';
-  if (document.getElementById('set-ha-url')) document.getElementById('set-ha-url').value = s.haUrl || '';
+  const s = loadSettings() || {};
+  
+  const fields = {
+    'set-company-name': s.name,
+    'set-company-nip': s.nip,
+    'set-company-address': s.address,
+    'set-company-contact': s.contact,
+    'set-ha-url': s.haUrl
+  };
+
+  Object.entries(fields).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val || '';
+  });
 }
 
 function saveSettings() {
+  const getVal = (id) => document.getElementById(id)?.value || '';
+
   const newSettings = {
-    name: document.getElementById('set-company-name').value,
-    nip: document.getElementById('set-company-nip').value,
-    address: document.getElementById('set-company-address').value,
-    contact: document.getElementById('set-company-contact').value,
-    haUrl: document.getElementById('set-ha-url').value
+    name: getVal('set-company-name'),
+    nip: getVal('set-company-nip'),
+    address: getVal('set-company-address'),
+    contact: getVal('set-company-contact'),
+    haUrl: getVal('set-ha-url')
   };
-  if (typeof saveData === 'function') {
+
+  if (typeof saveData === 'function' && typeof DB_KEYS !== 'undefined') {
     saveData(DB_KEYS.SETTINGS, newSettings);
-    alert('Ustawienia zapisane!');
+    alert('Ustawienia zostały pomyślnie zapisane!');
   }
 }
 
 function loadClientsToSelect() {
-  if (typeof getStoredData !== 'function') return;
+  if (typeof getStoredData !== 'function' || typeof DB_KEYS === 'undefined') return;
   const clients = getStoredData(DB_KEYS.CLIENTS, []);
   const select = document.getElementById('client-select');
   if (!select) return;
   
   select.innerHTML = '<option value="">-- Nowy Klient --</option>';
   clients.forEach((c, idx) => {
-    select.innerHTML += `<option value="${idx}">${c.name} (${c.address || ''})</option>`;
+    const option = document.createElement('option');
+    option.value = idx;
+    option.textContent = `${c.name} (${c.address || 'Brak adresu'})`;
+    select.appendChild(option);
   });
 }
 
 function onClientSelect(idx) {
-  if (idx === "" || typeof getStoredData !== 'function') return;
+  if (idx === "" || typeof getStoredData !== 'function' || typeof DB_KEYS === 'undefined') return;
   const clients = getStoredData(DB_KEYS.CLIENTS, []);
   const c = clients[idx];
   if (c) {
-    document.getElementById('c-name').value = c.name || '';
-    document.getElementById('c-address').value = c.address || '';
-    document.getElementById('c-contact').value = c.contact || '';
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val || '';
+    };
+    setVal('c-name', c.name);
+    setVal('c-address', c.address);
+    setVal('c-contact', c.contact);
   }
 }
 
 function loadClientsList() {
-  if (typeof getStoredData !== 'function') return;
+  if (typeof getStoredData !== 'function' || typeof DB_KEYS === 'undefined') return;
   const clients = getStoredData(DB_KEYS.CLIENTS, []);
   const container = document.getElementById('clients-list');
   if (!container) return;
@@ -153,48 +184,65 @@ function loadClientsList() {
 
   container.innerHTML = clients.map(c => `
     <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-      <p class="font-bold text-sm text-slate-800">${c.name}</p>
-      <p class="text-xs text-slate-600">${c.address || 'Brak adresu'}</p>
-      <p class="text-xs text-slate-500">${c.contact || 'Brak kontaktu'}</p>
+      <p class="font-bold text-sm text-slate-800">${escapeHtml(c.name)}</p>
+      <p class="text-xs text-slate-600">${escapeHtml(c.address || 'Brak adresu')}</p>
+      <p class="text-xs text-slate-500">${escapeHtml(c.contact || 'Brak kontaktu')}</p>
     </div>
   `).join('');
 }
 
+function generateProtocolId() {
+  const year = new Date().getFullYear();
+  let count = 1;
+  
+  if (typeof getStoredData === 'function' && typeof DB_KEYS !== 'undefined') {
+    const protocols = getStoredData(DB_KEYS.PROTOCOLS, []);
+    count = protocols.length + 1;
+  }
+  
+  // Formatowanie liczby do 3 cyfr, np. PR/2026/001
+  const sequenceNumber = String(count).padStart(3, '0');
+  return `PR/${year}/${sequenceNumber}`;
+}
+
 function generateAndSaveProtocol() {
-  const settings = typeof loadSettings === 'function' ? loadSettings() : {};
-  const cName = document.getElementById('c-name').value;
+  const settings = typeof loadSettings === 'function' ? (loadSettings() || {}) : {};
+  const cName = document.getElementById('c-name')?.value.trim();
+  
   if (!cName) {
-    alert('Wpisz nazwę / imię klienta!');
+    alert('Wpisz nazwę / imię i nazwisko klienta!');
     return;
   }
 
   const indoorUnits = [];
   document.querySelectorAll('#indoor-container .indoor-row').forEach(row => {
-    const loc = row.querySelector('.ind-loc') ? row.querySelector('.ind-loc').value : '';
-    const sn = row.querySelector('.ind-sn') ? row.querySelector('.ind-sn').value : '';
+    const loc = row.querySelector('.ind-loc')?.value.trim() || '';
+    const sn = row.querySelector('.ind-sn')?.value.trim() || '';
     if (loc || sn) indoorUnits.push({ loc, sn });
   });
 
+  const getVal = (id) => document.getElementById(id)?.value || '';
+
   const clientData = {
     name: cName,
-    address: document.getElementById('c-address').value,
-    contact: document.getElementById('c-contact').value
+    address: getVal('c-address'),
+    contact: getVal('c-contact')
   };
 
   const protocolData = {
-    id: 'PR/' + new Date().getFullYear() + '/' + String(Date.now()).slice(-4),
+    id: generateProtocolId(),
     date: new Date().toLocaleDateString('pl-PL'),
     client: clientData,
     equipment: {
-      type: document.getElementById('eq-type').value,
-      brand: document.getElementById('eq-brand').value,
-      sn: document.getElementById('eq-sn').value,
+      type: getVal('eq-type'),
+      brand: getVal('eq-brand'),
+      sn: getVal('eq-sn'),
       indoors: indoorUnits
     },
     service: {
-      type: document.getElementById('serv-type').value,
-      fgas: document.getElementById('fgas-type').value + ' ' + document.getElementById('fgas-amount').value,
-      notes: document.getElementById('serv-notes').value
+      type: getVal('serv-type'),
+      fgas: `${getVal('fgas-type')} ${getVal('fgas-amount')}`.trim(),
+      notes: getVal('serv-notes')
     },
     signatures: {
       client: typeof getCanvasDataURL === 'function' ? getCanvasDataURL('sig-client') : '',
@@ -202,7 +250,8 @@ function generateAndSaveProtocol() {
     }
   };
 
-  if (typeof getStoredData === 'function' && typeof saveData === 'function') {
+  // Zapis do pamięci podręcznej (LocalDB)
+  if (typeof getStoredData === 'function' && typeof saveData === 'function' && typeof DB_KEYS !== 'undefined') {
     const protocols = getStoredData(DB_KEYS.PROTOCOLS, []);
     protocols.unshift(protocolData);
     saveData(DB_KEYS.PROTOCOLS, protocols);
@@ -215,53 +264,68 @@ function generateAndSaveProtocol() {
     }
   }
 
-  document.getElementById('pdf-comp-name').innerText = settings.name || 'KLIMA-SERWIS';
-  document.getElementById('pdf-comp-addr').innerText = settings.address || '';
-  document.getElementById('pdf-comp-nip').innerText = 'NIP: ' + (settings.nip || '');
-  document.getElementById('pdf-comp-contact').innerText = settings.contact || '';
+  // Wypełnianie sekcji do druku PDF
+  const setTxt = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt || '';
+  };
 
-  document.getElementById('pdf-proto-num').innerText = protocolData.id;
-  document.getElementById('pdf-proto-date').innerText = protocolData.date;
-  document.getElementById('pdf-client-name').innerText = protocolData.client.name;
-  document.getElementById('pdf-client-addr').innerText = protocolData.client.address;
-  document.getElementById('pdf-client-contact').innerText = protocolData.client.contact;
+  setTxt('pdf-comp-name', settings.name || 'KLIMA-SERWIS');
+  setTxt('pdf-comp-addr', settings.address || '');
+  setTxt('pdf-comp-nip', settings.nip ? `NIP: ${settings.nip}` : '');
+  setTxt('pdf-comp-contact', settings.contact || '');
 
-  document.getElementById('pdf-eq-type').innerText = protocolData.equipment.type;
-  document.getElementById('pdf-eq-brand').innerText = protocolData.equipment.brand;
-  document.getElementById('pdf-eq-sn').innerText = protocolData.equipment.sn;
+  setTxt('pdf-proto-num', protocolData.id);
+  setTxt('pdf-proto-date', protocolData.date);
+  setTxt('pdf-client-name', protocolData.client.name);
+  setTxt('pdf-client-addr', protocolData.client.address);
+  setTxt('pdf-client-contact', protocolData.client.contact);
 
-  const indoorListHtml = protocolData.equipment.indoors.map((u, i) => `
-    <tr>
-      <td class="border border-slate-300 p-1 font-bold">${i + 1}.</td>
-      <td class="border border-slate-300 p-1">${u.loc || '-'}</td>
-      <td class="border border-slate-300 p-1">${u.sn || '-'}</td>
-    </tr>
-  `).join('');
-  document.getElementById('pdf-indoor-list').innerHTML = indoorListHtml || '<tr><td colspan="3" class="p-1 text-slate-400">Brak jednostek wewnętrznych</td></tr>';
+  setTxt('pdf-eq-type', protocolData.equipment.type);
+  setTxt('pdf-eq-brand', protocolData.equipment.brand);
+  setTxt('pdf-eq-sn', protocolData.equipment.sn);
 
-  document.getElementById('pdf-serv-type').innerText = protocolData.service.type;
-  document.getElementById('pdf-fgas').innerText = protocolData.service.fgas;
-  document.getElementById('pdf-notes').innerText = protocolData.service.notes;
-
-  const imgC = document.getElementById('pdf-sig-client-img');
-  if (protocolData.signatures.client) {
-    imgC.src = protocolData.signatures.client;
-    imgC.classList.remove('hidden');
+  // Bezpieczna budowa tabeli urządzeń z zabezpieczeniem XSS
+  const indoorContainer = document.getElementById('pdf-indoor-list');
+  if (indoorContainer) {
+    if (protocolData.equipment.indoors.length > 0) {
+      indoorContainer.innerHTML = protocolData.equipment.indoors.map((u, i) => `
+        <tr>
+          <td class="border border-slate-300 p-1 font-bold">${i + 1}.</td>
+          <td class="border border-slate-300 p-1">${escapeHtml(u.loc) || '-'}</td>
+          <td class="border border-slate-300 p-1">${escapeHtml(u.sn) || '-'}</td>
+        </tr>
+      `).join('');
+    } else {
+      indoorContainer.innerHTML = '<tr><td colspan="3" class="p-1 text-slate-400">Brak jednostek wewnętrznych</td></tr>';
+    }
   }
 
-  const imgT = document.getElementById('pdf-sig-tech-img');
-  if (protocolData.signatures.tech) {
-    imgT.src = protocolData.signatures.tech;
-    imgT.classList.remove('hidden');
-  }
+  setTxt('pdf-serv-type', protocolData.service.type);
+  setTxt('pdf-fgas', protocolData.service.fgas);
+  setTxt('pdf-notes', protocolData.service.notes);
 
+  // Wstawianie podpisów
+  const setSigImg = (id, dataUrl) => {
+    const img = document.getElementById(id);
+    if (img && dataUrl) {
+      img.src = dataUrl;
+      img.classList.remove('hidden');
+    }
+  };
+
+  setSigImg('pdf-sig-client-img', protocolData.signatures.client);
+  setSigImg('pdf-sig-tech-img', protocolData.signatures.tech);
+
+  // Integracja z Home Assistant
   if (typeof sendProtocolToHA === 'function') sendProtocolToHA(protocolData);
 
+  // Przejście do widoku druku
   showSection('print');
 }
 
 function loadHistory() {
-  if (typeof getStoredData !== 'function') return;
+  if (typeof getStoredData !== 'function' || typeof DB_KEYS === 'undefined') return;
   const protocols = getStoredData(DB_KEYS.PROTOCOLS, []);
   const container = document.getElementById('history-list');
   if (!container) return;
@@ -274,9 +338,9 @@ function loadHistory() {
   container.innerHTML = protocols.map(p => `
     <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center">
       <div>
-        <span class="font-bold text-sm text-blue-600">${p.id}</span>
-        <p class="font-semibold text-xs text-slate-800">${p.client.name}</p>
-        <p class="text-[10px] text-slate-500">${p.date} • ${p.service.type}</p>
+        <span class="font-bold text-sm text-blue-600">${escapeHtml(p.id)}</span>
+        <p class="font-semibold text-xs text-slate-800">${escapeHtml(p.client.name)}</p>
+        <p class="text-[10px] text-slate-500">${escapeHtml(p.date)} • ${escapeHtml(p.service.type)}</p>
       </div>
     </div>
   `).join('');

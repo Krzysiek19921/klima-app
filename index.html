@@ -6,7 +6,6 @@
   <title>KLIMA-SERWIS - Protokół Montażu i Serwisu</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="manifest" href="manifest.json">
-  <!-- Biblioteka do generowania PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
@@ -21,7 +20,7 @@
     </div>
   </header>
 
-  <main class="container" id="protocol-content">
+  <main class="container">
     <form id="protocol-form">
 
       <!-- 1. DANE FIRMY (WYKONAWCY) -->
@@ -97,7 +96,6 @@
       <fieldset class="protocol-section">
         <legend>4. Specyfikacja Urządzeń i Czynnika Chłodniczego</legend>
         
-        <!-- JEDNOSTKI WEWNĘTRZNE -->
         <div class="sub-section-title">
           <span>Jednostki Wewnętrzne</span>
           <button type="button" class="btn-add" id="add-indoor-btn">+ Dodaj jednostkę wewnętrzną</button>
@@ -120,7 +118,6 @@
           </div>
         </div>
 
-        <!-- JEDNOSTKI ZEWNĘTRZNE -->
         <div class="sub-section-title" style="margin-top: 25px;">
           <span>Jednostki Zewnętrzne</span>
           <button type="button" class="btn-add" id="add-outdoor-btn">+ Dodaj jednostkę zewnętrzną</button>
@@ -143,7 +140,6 @@
           </div>
         </div>
 
-        <!-- PARAMETRY CZYNNIKA -->
         <div class="card-box parameter-card" style="margin-top: 20px;">
           <div class="card-header"><strong>Parametry Czynnika Chłodniczego</strong></div>
           <div class="form-grid">
@@ -215,6 +211,9 @@
 
     </form>
   </main>
+
+  <!-- UKRYTY KONTENER DO GENEROWANIA DOKUMENTU A4 -->
+  <div id="pdf-print-area" style="position: absolute; left: -9999px; top: -9999px; width: 750px; background: #fff; padding: 20px;"></div>
 
   <script src="js/signature.js"></script>
   <script src="js/main.js"></script>

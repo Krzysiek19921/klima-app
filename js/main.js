@@ -1,5 +1,4 @@
 ﻿document.addEventListener('DOMContentLoaded', () => {
-  // Domyślna dzisiejsza data
   const dateInput = document.getElementById('service-date');
   if (dateInput && !dateInput.value) {
     dateInput.value = new Date().toISOString().split('T')[0];
@@ -24,7 +23,7 @@
     }
   });
 
-  // Dodawanie jednostek wewnętrznych
+  // Dynamiczne dodawanie jednostek wewnętrznych
   let indoorCount = 1;
   const addIndoorBtn = document.getElementById('add-indoor-btn');
   const indoorContainer = document.getElementById('indoor-units-container');
@@ -55,7 +54,7 @@
     });
   }
 
-  // Dodawanie jednostek zewnętrznych
+  // Dynamiczne dodawanie jednostek zewnętrznych
   let outdoorCount = 1;
   const addOutdoorBtn = document.getElementById('add-outdoor-btn');
   const outdoorContainer = document.getElementById('outdoor-units-container');
@@ -86,13 +85,12 @@
     });
   }
 
-  // --- GENEROWANIE CZYSTEGO DOKUMENTU PDF (NIE ZRZUTU APLIKACJI) ---
+  // --- GENEROWANIE DOKUMENTU PDF W UKRYTYM KONTENERZE ---
   const form = document.getElementById('protocol-form');
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      // Pobieranie danych z formularza
       const companyName = document.getElementById('company-name')?.value || '-';
       const companyNip = document.getElementById('company-nip')?.value || '-';
       const companyAddress = document.getElementById('company-address')?.value || '-';
@@ -116,111 +114,104 @@
         ? 'Urządzenie PODLEGA obowiązkowi wpisu do Centralnego Rejestru Operatorów (CRO).'
         : 'Urządzenie NIE PODLEGA obowiązkowi wpisu do Centralnego Rejestru Operatorów (CRO).';
 
-      // Pobieranie jednostek wewnętrznych i zewnętrznych
       let indoorHtml = '';
       document.querySelectorAll('#indoor-units-container .card-box').forEach((card, idx) => {
         const model = card.querySelector('.indoor-model')?.value || '-';
         const serial = card.querySelector('.indoor-serial')?.value || '-';
-        indoorHtml += `<tr><td>JW #${idx + 1}</td><td>${model}</td><td>${serial}</td></tr>`;
+        indoorHtml += `<tr><td style="border: 1px solid #000; padding: 6px;">JW #${idx + 1}</td><td style="border: 1px solid #000; padding: 6px;">${model}</td><td style="border: 1px solid #000; padding: 6px;">${serial}</td></tr>`;
       });
 
       let outdoorHtml = '';
       document.querySelectorAll('#outdoor-units-container .card-box').forEach((card, idx) => {
         const model = card.querySelector('.outdoor-model')?.value || '-';
         const serial = card.querySelector('.outdoor-serial')?.value || '-';
-        outdoorHtml += `<tr><td>JZ #${idx + 1}</td><td>${model}</td><td>${serial}</td></tr>`;
+        outdoorHtml += `<tr><td style="border: 1px solid #000; padding: 6px;">JZ #${idx + 1}</td><td style="border: 1px solid #000; padding: 6px;">${model}</td><td style="border: 1px solid #000; padding: 6px;">${serial}</td></tr>`;
       });
 
-      // Pobranie podpisów z Canvas jako obrazy DataURL
       const clientCanvas = document.getElementById('client-signature');
       const installerCanvas = document.getElementById('installer-signature');
       const clientSigImg = clientCanvas ? clientCanvas.toDataURL() : '';
       const installerSigImg = installerCanvas ? installerCanvas.toDataURL() : '';
 
-      // TWORZENIE CZYSTEGO SZABLONU A4 DLA DRUKU
-      const printTemplate = document.createElement('div');
-      printTemplate.style.width = '750px';
-      printTemplate.style.padding = '25px';
-      printTemplate.style.fontFamily = 'Arial, sans-serif';
-      printTemplate.style.fontSize = '12px';
-      printTemplate.style.color = '#000';
-      printTemplate.style.backgroundColor = '#fff';
+      const pdfArea = document.getElementById('pdf-print-area');
+      if (!pdfArea) return;
 
-      printTemplate.innerHTML = `
-        <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;">
-          <h2 style="margin:0; font-size: 20px;">PROTOKÓŁ MONTAŻU / SERWISU URZĄDZEŃ KLIMATYZACYJNYCH</h2>
-          <p style="margin:5px 0 0 0; font-size: 11px; color: #555;">Data wykonania usługi: <strong>${serviceDate}</strong></p>
-        </div>
+      pdfArea.innerHTML = `
+        <div style="font-family: Arial, sans-serif; font-size: 12px; color: #000; line-height: 1.4;">
+          <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px;">
+            <h2 style="margin: 0; font-size: 18px; text-transform: uppercase;">PROTOKÓŁ MONTAŻU / SERWISU KLIMATYZACJI</h2>
+            <p style="margin: 4px 0 0 0; font-size: 11px; color: #333;">Data wykonania usługi: <strong>${serviceDate}</strong></p>
+          </div>
 
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
-          <tr>
-            <td style="width: 50%; vertical-align: top; padding-right: 10px;">
-              <div style="border: 1px solid #000; padding: 8px; min-height: 110px;">
-                <strong style="font-size: 13px; text-decoration: underline;">WYKONAWCA / SERWIS:</strong><br>
-                <strong>${companyName}</strong><br>
-                NIP: ${companyNip}<br>
-                Adres: ${companyAddress}<br>
-                Tel: ${companyPhone} | Email: ${companyEmail}
-              </div>
-            </td>
-            <td style="width: 50%; vertical-align: top; padding-left: 10px;">
-              <div style="border: 1px solid #000; padding: 8px; min-height: 110px;">
-                <strong style="font-size: 13px; text-decoration: underline;">ZLECENIODAWCA / KLIENT:</strong><br>
-                <strong>${clientName}</strong><br>
-                Adres montażu: ${clientAddress}<br>
-                Tel: ${clientPhone}
-              </div>
-            </td>
-          </tr>
-        </table>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+            <tr>
+              <td style="width: 50%; vertical-align: top; padding-right: 8px;">
+                <div style="border: 1px solid #000; padding: 8px; min-height: 95px;">
+                  <strong style="font-size: 12px; text-decoration: underline;">WYKONAWCA / SERWIS:</strong><br>
+                  <strong style="font-size: 13px;">${companyName}</strong><br>
+                  NIP: ${companyNip}<br>
+                  Adres: ${companyAddress}<br>
+                  Tel: ${companyPhone} | Email: ${companyEmail}
+                </div>
+              </td>
+              <td style="width: 50%; vertical-align: top; padding-left: 8px;">
+                <div style="border: 1px solid #000; padding: 8px; min-height: 95px;">
+                  <strong style="font-size: 12px; text-decoration: underline;">ZLECENIODAWCA / KLIENT:</strong><br>
+                  <strong style="font-size: 13px;">${clientName}</strong><br>
+                  Adres montażu: ${clientAddress}<br>
+                  Tel: ${clientPhone}
+                </div>
+              </td>
+            </tr>
+          </table>
 
-        <div style="border: 1px solid #000; padding: 8px; margin-bottom: 15px;">
-          <strong style="font-size: 12px; text-decoration: underline;">CERTYFIKATY INSTALATORA:</strong><br>
-          Imię i nazwisko: <strong>${installerName}</strong> | Certyfikat F-Gaz indywidualny: <strong>${fgazCert}</strong><br>
-          Certyfikat F-Gaz przedsiębiorcy: <strong>${companyFgazCert}</strong>
-        </div>
+          <div style="border: 1px solid #000; padding: 8px; margin-bottom: 12px; background-color: #fafafa;">
+            <strong style="font-size: 11px; text-decoration: underline;">CERTYFIKATY INSTALATORA:</strong><br>
+            Serwisant: <strong>${installerName}</strong> | F-Gaz indywidualny: <strong>${fgazCert}</strong> | F-Gaz przedsiębiorcy: <strong>${companyFgazCert}</strong>
+          </div>
 
-        <div style="margin-bottom: 15px;">
-          <strong style="font-size: 13px;">SPECYFIKACJA ZAINSTALOWANYCH URZĄDZEŃ:</strong>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 5px; border: 1px solid #000;" border="1" cellpadding="5">
-            <thead>
-              <tr style="background-color: #f2f2f2;">
-                <th style="width: 25%; text-align: left;">Typ</th>
-                <th style="width: 45%; text-align: left;">Model urządzenia</th>
-                <th style="width: 30%; text-align: left;">Numer seryjny</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${indoorHtml}
-              ${outdoorHtml}
-            </tbody>
+          <div style="margin-bottom: 12px;">
+            <strong style="font-size: 12px;">SPECYFIKACJA URZĄDZEŃ:</strong>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 4px;" border="1">
+              <thead>
+                <tr style="background-color: #eee;">
+                  <th style="width: 20%; padding: 5px; text-align: left; border: 1px solid #000;">Typ</th>
+                  <th style="width: 50%; padding: 5px; text-align: left; border: 1px solid #000;">Model urządzenie</th>
+                  <th style="width: 30%; padding: 5px; text-align: left; border: 1px solid #000;">Numer seryjny</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${indoorHtml}
+                ${outdoorHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <div style="border: 1px solid #000; padding: 8px; margin-bottom: 12px;">
+            <strong style="font-size: 11px;">PARAMETRY CZYNNIKA CHŁODNICZEGO:</strong><br>
+            Rodzaj czynnika: <strong>${refrigerantType}</strong> | Ilość w układzie: <strong>${refrigerantAmount} kg</strong>
+          </div>
+
+          <div style="border: 1px solid #000; padding: 8px; margin-bottom: 25px; background-color: #fafafa;">
+            <strong style="font-size: 11px;">OŚWIADCZENIE CRO:</strong><br>
+            <span style="font-size: 10px; color: #222;">${croText} Zleceniodawca oświadcza, że został poinformowany o wymogach prawnych i braku/obowiązku rejestracji w CRO.</span>
+          </div>
+
+          <table style="width: 100%; margin-top: 30px;">
+            <tr>
+              <td style="width: 50%; text-align: center; vertical-align: bottom;">
+                ${clientSigImg ? `<img src="${clientSigImg}" style="max-height: 50px; max-width: 180px;"><br>` : ''}
+                _____________________________________<br>
+                <strong style="font-size: 10px;">Podpis Zleceniodawcy (Klienta)</strong>
+              </td>
+              <td style="width: 50%; text-align: center; vertical-align: bottom;">
+                ${installerSigImg ? `<img src="${installerSigImg}" style="max-height: 50px; max-width: 180px;"><br>` : ''}
+                _____________________________________<br>
+                <strong style="font-size: 10px;">Podpis Serwisanta / Instalatora</strong>
+              </td>
+            </tr>
           </table>
         </div>
-
-        <div style="border: 1px solid #000; padding: 8px; margin-bottom: 15px;">
-          <strong style="font-size: 12px;">PARAMETRY CZYNNIKA CHŁODNICZEGO:</strong><br>
-          Rodzaj czynnika: <strong>${refrigerantType}</strong> | Ilość w układzie: <strong>${refrigerantAmount} kg</strong>
-        </div>
-
-        <div style="border: 1px solid #000; padding: 8px; margin-bottom: 20px; background-color: #fcfcfc;">
-          <strong style="font-size: 11px;">INFORMACJA / OŚWIADCZENIE CRO:</strong><br>
-          <span style="font-size: 10px;">${croText} Zleceniodawca oświadcza, że został poinformowany o obowiązkach wynikających z ustawy F-Gazowej.</span>
-        </div>
-
-        <table style="width: 100%; margin-top: 20px;">
-          <tr>
-            <td style="width: 50%; text-align: center; vertical-align: bottom;">
-              ${clientSigImg ? `<img src="${clientSigImg}" style="max-height: 60px; max-width: 200px;"><br>` : ''}
-              _____________________________________<br>
-              <strong style="font-size: 11px;">Podpis Zleceniodawcy (Klienta)</strong>
-            </td>
-            <td style="width: 50%; text-align: center; vertical-align: bottom;">
-              ${installerSigImg ? `<img src="${installerSigImg}" style="max-height: 60px; max-width: 200px;"><br>` : ''}
-              _____________________________________<br>
-              <strong style="font-size: 11px;">Podpis Serwisanta / Instalatora</strong>
-            </td>
-          </tr>
-        </table>
       `;
 
       const fileName = `Protokol_${clientName.replace(/[^a-zA-Z0-9]/g, '_')}_${serviceDate}.pdf`;
@@ -233,8 +224,7 @@
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      // Generowanie PDF z czystego szablonu
-      html2pdf().set(opt).from(printTemplate).save().catch(err => {
+      html2pdf().set(opt).from(pdfArea).save().catch(err => {
         console.error('Błąd generowania PDF:', err);
         alert('Wystąpił błąd podczas generowania pliku PDF.');
       });

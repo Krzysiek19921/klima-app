@@ -1,8 +1,27 @@
 ﻿document.addEventListener('DOMContentLoaded', () => {
-  // Domyślna dzisiejsza data
+  // Domyślna dzisiejsza data i wyliczenie następnego przeglądu (+1 rok)
   const dateInput = document.getElementById('service-date');
-  if (dateInput && !dateInput.value) {
-    dateInput.value = new Date().toISOString().split('T')[0];
+  const nextDateInput = document.getElementById('next-service-date');
+
+  if (dateInput) {
+    if (!dateInput.value) {
+      const today = new Date();
+      dateInput.value = today.toISOString().split('T')[0];
+      
+      if (nextDateInput && !nextDateInput.value) {
+        const nextYear = new Date();
+        nextYear.setFullYear(today.getFullYear() + 1);
+        nextDateInput.value = nextYear.toISOString().split('T')[0];
+      }
+    }
+
+    dateInput.addEventListener('change', () => {
+      if (dateInput.value && nextDateInput) {
+        const selectedDate = new Date(dateInput.value);
+        selectedDate.setFullYear(selectedDate.getFullYear() + 1);
+        nextDateInput.value = selectedDate.toISOString().split('T')[0];
+      }
+    });
   }
 
   // Zapamiętywanie danych firmy i instalatora w localStorage
@@ -24,7 +43,7 @@
     }
   });
 
-  // Dodawanie jednostek wewnętrznych
+  // Dynamiczne dodawanie jednostek wewnętrznych
   let indoorCount = 1;
   const addIndoorBtn = document.getElementById('add-indoor-btn');
   const indoorContainer = document.getElementById('indoor-units-container');
@@ -55,7 +74,7 @@
     });
   }
 
-  // Dodawanie jednostek zewnętrznych
+  // Dynamiczne dodawanie jednostek zewnętrznych
   let outdoorCount = 1;
   const addOutdoorBtn = document.getElementById('add-outdoor-btn');
   const outdoorContainer = document.getElementById('outdoor-units-container');
@@ -86,7 +105,7 @@
     });
   }
 
-  // --- BEZPOŚREDNIE GENEROWANIE FORMULARZA DO PDF ---
+  // GENEROWANIE DOKUMENTU PDF Z DOKŁADNEGO WIDOKU FORMULARZA
   const form = document.getElementById('protocol-form');
   if (form) {
     form.addEventListener('submit', (e) => {
@@ -94,12 +113,13 @@
 
       const clientName = document.getElementById('client-name')?.value || 'Klient';
       const serviceDate = document.getElementById('service-date')?.value || '';
-      const fileName = `Protokol_${clientName.replace(/[^a-zA-Z0-9]/g, '_')}_${serviceDate}.pdf`;
+      const protocolType = document.getElementById('protocol-type')?.value || 'Protokol';
+      
+      const fileName = `${protocolType.replace(/\s+/g, '_')}_${clientName.replace(/[^a-zA-Z0-9]/g, '_')}_${serviceDate}.pdf`;
 
-      // Pobieramy całą sekcję główną aplikacji
       const element = document.querySelector('main');
 
-      // Ukrywamy przyciski akcji na czas generowania PDF
+      // Ukrycie przycisków przed wykonaniem zrzutu PDF
       const buttons = document.querySelectorAll('button, .btn-add, .btn-remove, .btn-clear, .btn-submit');
       buttons.forEach(btn => btn.style.display = 'none');
 
@@ -111,7 +131,6 @@
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      // Generujemy PDF z aktualnego widoku i przywracamy przyciski
       html2pdf().set(opt).from(element).save().then(() => {
         buttons.forEach(btn => btn.style.display = '');
       }).catch(err => {

@@ -1,31 +1,24 @@
-const canvases = {};
-
-function initCanvas(canvasId) {
+// Obsługa podpisów na elementach Canvas
+function setupSignatureCanvas(canvasId, clearBtnId) {
   const canvas = document.getElementById(canvasId);
+  const clearBtn = document.getElementById(clearBtnId);
   if (!canvas) return;
 
-  const ctx = canvas.getContext('2d');
-  
-  // Ustawienie rozdzielczości kanwy do faktycznych wymiarów z CSS
-  function resizeCanvas() {
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width > 0 && rect.height > 0) {
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-    }
-  }
-  
-  resizeCanvas();
-
+  const ctx = canvas.getContext("2d");
   let isDrawing = false;
 
+  // Ustawienie wyższej rozdzielczości wewnętrznej dla płynniejszych linii
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width || 300;
+  canvas.height = rect.height || 120;
+
   function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
+    const currentRect = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     return {
-      x: clientX - rect.left,
-      y: clientY - rect.top
+      x: clientX - currentRect.left,
+      y: clientY - currentRect.top
     };
   }
 
@@ -38,50 +31,41 @@ function initCanvas(canvasId) {
 
   function draw(e) {
     if (!isDrawing) return;
-    if (e.cancelable) e.preventDefault(); // Zapobiega przewijaniu strony podczas rysowania
-    
+    e.preventDefault(); // Zapobiega przewijaniu ekranu podczas podpisywania na telefonie
     const pos = getPos(e);
     ctx.lineWidth = 2.5;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = '#0f172a';
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#002b66"; // Ciemnoniebieski kolor tuszu
     ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
   }
 
   function stopDrawing() {
     isDrawing = false;
-    ctx.beginPath();
   }
 
-  // Zdarzenia Myszki
-  canvas.addEventListener('mousedown', startDrawing);
-  canvas.addEventListener('mousemove', draw);
-  window.addEventListener('mouseup', stopDrawing);
+  // Obsługa myszki (Komputer / Laptop)
+  canvas.addEventListener("mousedown", startDrawing);
+  canvas.addEventListener("mousemove", draw);
+  canvas.addEventListener("mouseup", stopDrawing);
+  canvas.addEventListener("mouseleave", stopDrawing);
 
-  // Zdarzenia Ekrany Dotykowe (Mobile)
-  canvas.addEventListener('touchstart', startDrawing, { passive: false });
-  canvas.addEventListener('touchmove', draw, { passive: false });
-  canvas.addEventListener('touchend', stopDrawing);
+  // Obsługa dotyku (Smartfon / Tablet)
+  canvas.addEventListener("touchstart", startDrawing, { passive: false });
+  canvas.addEventListener("touchmove", draw, { passive: false });
+  canvas.addEventListener("touchend", stopDrawing);
 
-  canvases[canvasId] = { canvas, ctx };
-}
-
-function clearCanvas(canvasId) {
-  const item = canvases[canvasId];
-  if (item) {
-    item.ctx.clearRect(0, 0, item.canvas.width, item.canvas.height);
+  // Przycisk czyszczenia pola podpisu
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
   }
 }
 
-function getCanvasDataURL(canvasId) {
-  const item = canvases[canvasId];
-  if (!item) return '';
-
-  const pixelBuffer = new Uint32Array(
-    item.ctx.getImageData(0, 0, item.canvas.width, item.canvas.height).data.buffer
-  );
-  const isCanvasBlank = !pixelBuffer.some(color => color !== 0);
-
-  return isCanvasBlank ? '' : item.canvas.toDataURL('image/png');
-}
+// Inicjalizacja pól podpisów po załadowaniu drzewa DOM
+document.addEventListener("DOMContentLoaded", () => {
+  setupSignatureCanvas("client-signature", "clear-client-sig");
+  setupSignatureCanvas("installer-signature", "clear-installer-sig");
+});

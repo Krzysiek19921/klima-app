@@ -6,6 +6,8 @@
   <title>KLIMA-SERWIS - Protokół Montażu i Serwisu</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="manifest" href="manifest.json">
+  <!-- Biblioteka do generowania PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -19,7 +21,7 @@
     </div>
   </header>
 
-  <main class="container">
+  <main class="container" id="protocol-content">
     <form id="protocol-form">
 
       <!-- 1. DANE FIRMY (WYKONAWCY) -->
@@ -28,7 +30,7 @@
         <div class="form-grid">
           <div class="form-group full-width">
             <label for="company-name">Nazwa firmy / Pieczęć:</label>
-            <input type="text" id="company-name" value="KLIMA-SERWIS sp. z o.o." required>
+            <input type="text" id="company-name" placeholder="KLIMA-SERWIS sp. z o.o." required>
           </div>
           <div class="form-group">
             <label for="company-nip">NIP:</label>

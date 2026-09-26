@@ -2,354 +2,153 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>KLIMA-SERWIS — Protokół</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <!-- PWA Requirements -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KLIMA-SERWIS - Protokół Montażu i Serwisu</title>
+  <link rel="stylesheet" href="css/style.css">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2563eb">
-  <link rel="apple-touch-icon" href="https://img.icons8.com/color/512/air-conditioner.png">
-
-  <!-- Style aplikacji -->
-  <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans pb-12">
+<body>
 
-  <!-- Nagłówek aplikacji (Aplikacja / Mobile) -->
-  <header class="no-print bg-slate-900 text-white p-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
-    <div class="flex items-center gap-3">
-      <div class="bg-blue-600 p-2 rounded-lg"><i data-lucide="wrench" class="w-6 h-6 text-white"></i></div>
+  <header class="app-header">
+    <div class="header-content">
+      <img src="css/logo.png" alt="Logo Firmy" class="company-logo" onerror="this.style.display='none'">
       <div>
-        <h1 class="font-bold text-lg leading-tight">KLIMA-SERWIS</h1>
-        <p class="text-xs text-slate-400">System Protokołów & HA</p>
+        <h1>KLIMA-SERWIS</h1>
+        <p class="subtitle">Montaż, Serwis i Konserwacja Klimatyzacji</p>
       </div>
-    </div>
-    <div class="flex gap-1">
-      <button onclick="showSection('wizard')" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 transition cursor-pointer">
-        <i data-lucide="file-plus-2" class="w-4 h-4"></i><span class="hidden sm:inline">Nowy Protokół</span>
-      </button>
-      <button onclick="showSection('settings')" class="p-2 hover:bg-slate-800 rounded-lg text-slate-300 transition cursor-pointer" title="Ustawienia">
-        <i data-lucide="settings" class="w-5 h-5"></i>
-      </button>
     </div>
   </header>
 
-  <!-- Nawigacja Dolna (Pasek mobilny) -->
-  <nav class="no-print fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 flex justify-around p-2 z-50 text-slate-400">
-    <button onclick="showSection('wizard')" class="nav-btn flex flex-col items-center gap-1 text-xs text-blue-500 font-medium cursor-pointer">
-      <i data-lucide="file-plus" class="w-5 h-5"></i> Nowy
-    </button>
-    <button onclick="showSection('history')" class="nav-btn flex flex-col items-center gap-1 text-xs hover:text-white cursor-pointer">
-      <i data-lucide="history" class="w-5 h-5"></i> Historia
-    </button>
-    <button onclick="showSection('clients')" class="nav-btn flex flex-col items-center gap-1 text-xs hover:text-white cursor-pointer">
-      <i data-lucide="users" class="w-5 h-5"></i> Klienci
-    </button>
-    <button onclick="showSection('settings')" class="nav-btn flex flex-col items-center gap-1 text-xs hover:text-white cursor-pointer">
-      <i data-lucide="sliders" class="w-5 h-5"></i> Ustawienia
-    </button>
-  </nav>
+  <main class="container">
+    <form id="protocol-form">
 
-  <main class="max-w-4xl mx-auto p-4 space-y-6">
+      <!-- DANE FIRMY / SERWISANTA -->
+      <fieldset class="protocol-section">
+        <legend>Dane Wykonawcy / Instalatora</legend>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="installer-company">Nazwa firmy:</label>
+            <input type="text" id="installer-company" value="KLIMA-SERWIS" required>
+          </div>
+          <div class="form-group">
+            <label for="installer-name">Imię i nazwisko serwisanta:</label>
+            <input type="text" id="installer-name" placeholder="np. Jan Kowalski" required>
+          </div>
+          <div class="form-group">
+            <label for="fgaz-cert">Certyfikat F-Gaz (Osobowy):</label>
+            <input type="text" id="fgaz-cert" placeholder="np. FGAZ-O/12/00000/20" required>
+          </div>
+          <div class="form-group">
+            <label for="company-fgaz-cert">Certyfikat F-Gaz (Przedsiębiorcy):</label>
+            <input type="text" id="company-fgaz-cert" placeholder="np. FGAZ-P/12/00000/20">
+          </div>
+        </div>
+      </fieldset>
 
-    <!-- SEKCJA 1: FORMULARZ PROTOKOŁU -->
-    <section id="sec-wizard" class="app-section space-y-6">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-900">
-          <i data-lucide="user-check" class="text-blue-600"></i> 1. Dane Klienta
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Wybierz istniejącego lub wpisz nowego</label>
-            <select id="client-select" onchange="onClientSelect(this.value)" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm">
-              <option value="">-- Nowy Klient --</option>
+      <!-- DANE KLIENTA I LOKALIZACJA -->
+      <fieldset class="protocol-section">
+        <legend>Dane Zleceniodawcy i Miejsce Montażu</legend>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="client-name">Imię i nazwisko / Firma klienta:</label>
+            <input type="text" id="client-name" required>
+          </div>
+          <div class="form-group">
+            <label for="client-address">Adres montażu/serwisu:</label>
+            <input type="text" id="client-address" required>
+          </div>
+          <div class="form-group">
+            <label for="client-phone">Telefon kontaktowy:</label>
+            <input type="tel" id="client-phone">
+          </div>
+          <div class="form-group">
+            <label for="service-date">Data wykonania usługi:</label>
+            <input type="date" id="service-date" required>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- PARAMETRY URZĄDZENIA -->
+      <fieldset class="protocol-section">
+        <legend>Specyfikacja Urządzenia i Czynnika</legend>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="device-model">Model urządzenia (Jednostka wewn./zewn.):</label>
+            <input type="text" id="device-model" placeholder="np. Rotenso / Gree Split 3.5 kW" required>
+          </div>
+          <div class="form-group">
+            <label for="serial-number">Numer seryjny:</label>
+            <input type="text" id="serial-number">
+          </div>
+          <div class="form-group">
+            <label for="refrigerant-type">Rodzaj czynnika chłodniczego:</label>
+            <select id="refrigerant-type">
+              <option value="R32">R32</option>
+              <option value="R410A">R410A</option>
+              <option value="R134a">R134a</option>
+              <option value="Inny">Inny</option>
             </select>
           </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Imię i Nazwisko / Firma *</label>
-            <input type="text" id="c-name" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" placeholder="Jan Kowalski">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Adres montażu/serwisu</label>
-            <input type="text" id="c-address" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" placeholder="ul. Słoneczna 12, Kraków">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Telefon / Email</label>
-            <input type="text" id="c-contact" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" placeholder="+48 600 000 000">
+          <div class="form-group">
+            <label for="refrigerant-amount">Ilość czynnika (kg):</label>
+            <input type="number" step="0.01" id="refrigerant-amount" placeholder="0.80">
           </div>
         </div>
-      </div>
+      </fieldset>
 
-      <!-- Urządzenia Zewnętrzne i Wewnętrzne -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-900">
-          <i data-lucide="cpu" class="text-blue-600"></i> 2. Dane Agregatu i Jednostek
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Typ urządzenia</label>
-            <select id="eq-type" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm">
-              <option value="Klimatyzator Split/Multi">Klimatyzator Split / Multi-Split</option>
-              <option value="Pompa Ciepła Air/Water">Pompa Ciepła</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Producent / Marka</label>
-            <input type="text" id="eq-brand" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" placeholder="np. DAIKIN / Gree / Mitsubishi">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Model / Nr Seryjny Zewn.</label>
-            <input type="text" id="eq-sn" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" placeholder="Model i S/N">
-          </div>
-        </div>
-
-        <div class="border-t border-slate-200 pt-4">
-          <div class="flex justify-between items-center mb-3">
-            <h3 class="font-bold text-sm text-slate-700">Jednostki wewnętrzne (maks. 5)</h3>
-            <button type="button" id="btn-add-indoor" onclick="addIndoorUnit()" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 hover:bg-blue-100 transition cursor-pointer">+ Dodaj jednostkę</button>
-          </div>
-          <div id="indoor-container" class="space-y-3">
-            <!-- Dynamiczne jednostki wewnętrzne -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Usługa, F-Gazy, Szczelność -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-900">
-          <i data-lucide="shield-check" class="text-blue-600"></i> 3. Zakres Usługi i F-Gazy
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Rodzaj wykonanych prac</label>
-            <select id="serv-type" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-blue-700">
-              <option value="Montaż i Uruchomienie">Montaż i pierwsze uruchomienie</option>
-              <option value="Przegląd Okresowy">Przegląd okresowy / Serwis</option>
-              <option value="Kontrola Szczelności">Kontrola szczelności (F-Gaz)</option>
-              <option value="Naprawa / Serwis Awaryjny">Naprawa / Awaria</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Czynnik / Ilość (kg)</label>
-            <div class="flex gap-2">
-              <input type="text" id="fgas-type" class="w-1/2 p-2.5 border border-slate-300 rounded-lg text-sm" placeholder="R32 / R410A">
-              <input type="text" id="fgas-amount" class="w-1/2 p-2.5 border border-slate-300 rounded-lg text-sm" placeholder="np. 1.15 kg">
-            </div>
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Wynik Próby Szczelności / Uwagi</label>
-          <textarea id="serv-notes" rows="2" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" placeholder="Próba azotowa pozytywna (30 bar), odgrzybiono parowniki, zmierzono parametry pracy..."></textarea>
-        </div>
-      </div>
-
-      <!-- Podpisy -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-900">
-          <i data-lucide="pen-tool" class="text-blue-600"></i> 4. Podpisy Cyfrowe
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2">Podpis Klienta (Inwestor)</label>
-            <div class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 relative overflow-hidden">
-              <canvas id="sig-client" class="w-full h-32 touch-none cursor-crosshair"></canvas>
-              <button type="button" onclick="clearCanvas('sig-client')" class="absolute top-2 right-2 text-xs bg-slate-200 hover:bg-slate-300 px-2 py-1 rounded cursor-pointer">Wyczyść</button>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2">Podpis Instalatora / Serwisanta</label>
-            <div class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 relative overflow-hidden">
-              <canvas id="sig-tech" class="w-full h-32 touch-none cursor-crosshair"></canvas>
-              <button type="button" onclick="clearCanvas('sig-tech')" class="absolute top-2 right-2 text-xs bg-slate-200 hover:bg-slate-300 px-2 py-1 rounded cursor-pointer">Wyczyść</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Generowanie / Zapis -->
-      <div class="flex gap-4">
-        <button type="button" onclick="generateAndSaveProtocol()" class="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition cursor-pointer">
-          <i data-lucide="file-check-2"></i> Zapisz Protokół i Generuj PDF
-        </button>
-      </div>
-    </section>
-
-    <!-- SEKCJA 2: USTAWIENIA I HA -->
-    <section id="sec-settings" class="app-section hidden space-y-6">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-900">
-          <i data-lucide="building" class="text-blue-600"></i> Dane Mojej Firmy (Do Nagłówka)
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Nazwa Firmy</label>
-            <input type="text" id="set-company-name" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" value="KLIMA-SERWIS Sp. z o.o.">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">NIP</label>
-            <input type="text" id="set-company-nip" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" value="123-456-78-90">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Adres Firmy</label>
-            <input type="text" id="set-company-address" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" value="ul. Przykładowa 10, Kraków">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Telefon / Email</label>
-            <input type="text" id="set-company-contact" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" value="+48 123 456 789 | serwis@firma.pl">
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-900">
-          <i data-lucide="home" class="text-blue-600"></i> Integracja z Home Assistant (Webhook)
-        </h2>
-        <p class="text-xs text-slate-500 mb-4">Podaj URL Webhooka utworzonego w Home Assistant. Każdy zapisany protokół automatycznie wyśle powiadomienie z danymi do HA.</p>
-        <div class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Home Assistant Webhook URL</label>
-            <input type="text" id="set-ha-url" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-mono" placeholder="http://192.168.1.100:8123/api/webhook/klima_protocol_sync">
-          </div>
-          <button type="button" onclick="testHAConnection()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-semibold transition cursor-pointer">Testuj Połączenie</button>
-        </div>
-      </div>
-      
-      <button type="button" onclick="saveSettings()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition cursor-pointer">Zapisz Ustawienia</button>
-    </section>
-
-    <!-- SEKCJA 3: HISTORIA PROTOKOŁÓW -->
-    <section id="sec-history" class="app-section hidden space-y-4">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-900">
-          <i data-lucide="history" class="text-blue-600"></i> Historia Protokołów
-        </h2>
-        <div id="history-list" class="space-y-3">
-          <!-- Wypełniane dynamicznie przez JS -->
-        </div>
-      </div>
-    </section>
-
-    <!-- SEKCJA 4: BAZA KLIENTÓW -->
-    <section id="sec-clients" class="app-section hidden space-y-4">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-900">
-          <i data-lucide="users" class="text-blue-600"></i> Zapisani Klienci
-        </h2>
-        <div id="clients-list" class="space-y-3">
-          <!-- Wypełniane dynamicznie przez JS -->
-        </div>
-      </div>
-    </section>
-
-    <!-- SEKCJA 5: PODGLĄD DOKUMENTU A4 DO DRUKU -->
-    <section id="sec-print" class="app-section hidden">
-      <div class="no-print mb-4 flex justify-between items-center bg-slate-800 text-white p-4 rounded-xl">
-        <button type="button" onclick="showSection('wizard')" class="text-sm font-bold bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded transition cursor-pointer">&larr; Wróć do edycji</button>
-        <button type="button" onclick="window.print()" class="bg-emerald-500 hover:bg-emerald-600 font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition cursor-pointer">
-          <i data-lucide="printer"></i> Drukuj / Pobierz PDF
-        </button>
-      </div>
-
-      <!-- KARTA A4 -->
-      <div id="a4-page" class="bg-white p-8 border border-slate-300 shadow-xl mx-auto text-slate-900 text-xs font-sans max-w-[210mm]">
-        <!-- Nagłówek -->
-        <div class="flex justify-between items-start border-b-2 border-slate-800 pb-4 mb-4">
-          <div>
-            <h1 class="text-xl font-extrabold text-blue-900" id="pdf-comp-name">KLIMA-SERWIS Sp. z o.o.</h1>
-            <p id="pdf-comp-addr">ul. Przykładowa 10, Kraków</p>
-            <p id="pdf-comp-nip">NIP: 123-456-78-90</p>
-            <p id="pdf-comp-contact">Tel: +48 123 456 789</p>
-          </div>
-          <div class="text-right">
-            <h2 class="text-base font-extrabold text-slate-800">PROTOKÓŁ PRAC TECHNICZNYCH</h2>
-            <p class="font-mono font-bold text-blue-600" id="pdf-proto-num">PR/2026/09/0001</p>
-            <p class="mt-1">Data: <span id="pdf-proto-date">24.09.2026</span></p>
-          </div>
-        </div>
-
-        <!-- Klient -->
-        <div class="bg-slate-50 p-3 rounded border border-slate-200 mb-4">
-          <h3 class="font-bold text-slate-700 uppercase mb-1 text-[10px]">Zleceniodawca / Miejsce Usługi:</h3>
-          <p class="font-bold text-sm" id="pdf-client-name">Jan Kowalski</p>
-          <p id="pdf-client-addr">ul. Słoneczna 12, Kraków</p>
-          <p id="pdf-client-contact">Tel: +48 600 000 000</p>
-        </div>
-
-        <!-- Urządzenie -->
-        <div class="mb-4">
-          <h3 class="font-bold border-b border-slate-300 pb-1 mb-2 uppercase text-[10px]">1. Specyfikacja Urządzenia i Jednostek</h3>
-          <p><strong>Typ:</strong> <span id="pdf-eq-type">Split</span> | <strong>Marka:</strong> <span id="pdf-eq-brand">DAIKIN</span> | <strong>Nr Seryjny Zewn:</strong> <span id="pdf-eq-sn">XYZ123456</span></p>
-          
-          <table class="w-full mt-2 border-collapse border border-slate-300">
-            <thead>
-              <tr class="bg-slate-100 font-semibold text-slate-700 text-left">
-                <th class="border border-slate-300 p-1">Lp.</th>
-                <th class="border border-slate-300 p-1">Lokalizacja / Pomieszczenie</th>
-                <th class="border border-slate-300 p-1">Model / Numer Seryjny WEWN.</th>
-              </tr>
-            </thead>
-            <tbody id="pdf-indoor-list">
-              <!-- Dynamicznie injectowane przez JS -->
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Zakres i F-Gaz -->
-        <div class="mb-4">
-          <h3 class="font-bold border-b border-slate-300 pb-1 mb-2 uppercase text-[10px]">2. Zakres Prac i Rozliczenie Czynnika (F-GAZ)</h3>
-          <p><strong>Rodzaj usługi:</strong> <span id="pdf-serv-type">Montaż i Uruchomienie</span></p>
-          <p><strong>Czynnik Chłodniczy:</strong> <span id="pdf-fgas">R32 (1.15 kg)</span></p>
-          <div class="mt-2 p-2 border border-slate-200 rounded bg-slate-50">
-            <strong>Opis/Wynik kontroli szczelności i uruchomienia:</strong>
-            <p id="pdf-notes" class="mt-1 italic">Próba ciśnieniowa azotowa pozytywna.</p>
-          </div>
-        </div>
-
-        <!-- Oświadczenie -->
-        <p class="text-[9px] text-slate-500 mb-6 leading-tight">
-          Potwierdzam prawidłowe wykonanie prac. Urządzenie zostało uruchomione i przekazane do eksploatacji. Użytkownik został poinstruowany w zakresie obsługi i czyszczenia filtrów. Prace z czynnikiem chłodniczym wykonano zgodnie z przepisami ustawy F-gazowej.
+      <!-- KLAUZULA CRO -->
+      <div class="cro-clause-box">
+        <h4>Oświadczenie i Pouczenie CRO (Centralny Rejestr Operatorów)</h4>
+        <p class="cro-text">
+          Zgodnie z Ustawą z dnia 15 maja 2015 r. o substancjach zubożających warstwę ozonową oraz o niektórych fluorowanych gazach cieplarnianych, Zleceniodawca został poinformowany przez certyfikowanego serwisanta o wymogach prawnych dotyczących rejestracji urządzenia w Centralnym Rejestrze Operatorów (CRO).
         </p>
 
-        <!-- Podpisy -->
-        <div class="grid grid-cols-2 gap-8 pt-4 border-t border-slate-300">
-          <div class="text-center">
-            <div class="h-16 flex justify-center items-center">
-              <img id="pdf-sig-client-img" class="max-h-16 hidden" alt="Podpis Klienta">
-            </div>
-            <p class="border-t border-slate-400 pt-1 font-semibold text-[10px]">Podpis Klienta (Inwestora)</p>
-          </div>
-          <div class="text-center">
-            <div class="h-16 flex justify-center items-center">
-              <img id="pdf-sig-tech-img" class="max-h-16 hidden" alt="Podpis Wykonawcy">
-            </div>
-            <p class="border-t border-slate-400 pt-1 font-semibold text-[10px]">Podpis Wykonawcy (Instalatora)</p>
-          </div>
+        <div class="cro-options">
+          <label class="radio-label">
+            <input type="radio" name="cro_option" value="required" required>
+            <span><strong>Urządzenie PODLEGA obowiązkowi wpisu do CRO</strong> (&ge; 5 ton ekwiwalentu CO<sub>2</sub>). Zleceniodawca ma obowiązek utworzenia karty urządzenia w terminie 15 dni roboczych.</span>
+          </label>
+
+          <label class="radio-label">
+            <input type="radio" name="cro_option" value="not_required" required>
+            <span><strong>Urządzenie NIE PODLEGA obowiązkowi wpisu do CRO</strong> (Napełnienie poniżej progu 5 ton ekwiwalentu CO<sub>2</sub> – standardowe układy domowe Split).</span>
+          </label>
+        </div>
+
+        <div class="acknowledgment-check">
+          <label>
+            <input type="checkbox" id="cro-acknowledged" required>
+            Potwierdzam przyjęcie do wiadomości powyższych informacji oraz stan techniczny urządzenia.
+          </label>
         </div>
       </div>
-    </section>
 
+      <!-- SEKCJA PODPISÓW -->
+      <fieldset class="protocol-section">
+        <legend>Podpisy i Zatwierdzenie</legend>
+        <div class="signatures-grid">
+          <div class="signature-box">
+            <label>Podpis Zleceniodawcy (Klienta):</label>
+            <canvas id="client-signature" width="300" height="120"></canvas>
+            <button type="button" class="btn-clear" id="clear-client-sig">Wyczyść podpis</button>
+          </div>
+          <div class="signature-box">
+            <label>Podpis Serwisanta / Instalatora:</label>
+            <canvas id="installer-signature" width="300" height="120"></canvas>
+            <button type="button" class="btn-clear" id="clear-installer-sig">Wyczyść podpis</button>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">Zapisz / Generuj Protokół</button>
+      </div>
+
+    </form>
   </main>
 
-  <!-- Skrypty JS -->
-  <script src="js/db.js"></script>
+  <!-- Skrypty JavaScript -->
   <script src="js/signature.js"></script>
-  <script src="js/ha-connect.js"></script>
-  <script src="js/app.js"></script>
-
-  <!-- Rejestracja Service Workera (PWA) -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('PWA Service Worker zarejestrowany! Scope:', reg.scope))
-          .catch(err => console.error('Błąd rejestracji SW:', err));
-      });
-    }
-  </script>
+  <script src="js/main.js"></script>
 </body>
 </html>

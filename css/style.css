@@ -197,7 +197,6 @@ canvas {
   display: none !important;
 }
 
-/* KATALOG PROTOKOŁÓW */
 .catalog-section {
   background: white;
   border: 1px solid var(--border-color);
@@ -237,13 +236,19 @@ canvas {
 }
 
 /* ==========================================
-   DOKŁADNE STYLOWANIE DRUKU / PDF
+   TRYB GENEROWANIA PDF (IDEALNIE OD GÓRY STRONY)
    ========================================== */
 
 body.pdf-mode {
   background-color: #ffffff !important;
   color: #000000 !important;
-  font-family: 'Segoe UI', Arial, sans-serif !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.pdf-mode .app-header {
+  display: none !important; /* Ukrywamy wielki niebieski nagłówek aplikacji z PDF */
 }
 
 body.pdf-mode .container {
@@ -253,29 +258,32 @@ body.pdf-mode .container {
   padding: 0 !important;
 }
 
-body.pdf-mode .app-header {
-  background: #0284c7 !important;
-  color: white !important;
-  padding: 12px !important;
-  margin-bottom: 15px !important;
+body.pdf-mode #protocol-form {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Tytuł dokumentu na samej górze kartki */
+body.pdf-mode .pdf-document-header {
+  display: block !important;
   text-align: center !important;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
+  border-bottom: 2px solid #0284c7 !important;
+  padding-bottom: 8px !important;
+  margin-bottom: 15px !important;
 }
 
-body.pdf-mode .app-header h1 {
-  font-size: 1.3rem !important;
-}
-
-body.pdf-mode .app-header p {
-  font-size: 0.8rem !important;
+body.pdf-mode .pdf-document-header h2 {
+  font-size: 16pt !important;
+  color: #0284c7 !important;
+  text-transform: uppercase !important;
+  margin: 0 !important;
 }
 
 body.pdf-mode .protocol-section {
   border: 1px solid #cbd5e1 !important;
-  border-radius: 6px !important;
-  margin-bottom: 12px !important;
-  padding: 12px !important;
+  border-radius: 4px !important;
+  margin-bottom: 10px !important;
+  padding: 10px !important;
   background: #ffffff !important;
   box-shadow: none !important;
   page-break-inside: avoid !important;
@@ -283,17 +291,18 @@ body.pdf-mode .protocol-section {
 }
 
 body.pdf-mode legend {
-  font-size: 0.95rem !important;
+  font-size: 10pt !important;
   font-weight: bold !important;
   color: #0284c7 !important;
-  padding: 0 6px !important;
+  padding: 0 4px !important;
+  margin-bottom: 6px !important;
 }
 
 body.pdf-mode .card-box {
   background: #f8fafc !important;
   border: 1px solid #e2e8f0 !important;
   padding: 8px !important;
-  margin-bottom: 8px !important;
+  margin-bottom: 6px !important;
   page-break-inside: avoid !important;
   break-inside: avoid !important;
 }
@@ -308,39 +317,45 @@ body.pdf-mode .catalog-section {
 }
 
 body.pdf-mode .form-grid {
-  display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
-  gap: 10px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px 12px !important;
+}
+
+body.pdf-mode .form-group {
+  flex: 1 1 45% !important;
+  margin-bottom: 2px !important;
 }
 
 body.pdf-mode .form-group.full-width {
-  grid-column: 1 / -1 !important;
+  flex: 1 1 100% !important;
 }
 
 body.pdf-mode label {
-  font-size: 0.75rem !important;
+  font-size: 8pt !important;
   font-weight: bold !important;
   color: #475569 !important;
+  display: block !important;
   margin-bottom: 2px !important;
 }
 
 body.pdf-mode input,
 body.pdf-mode select,
 body.pdf-mode textarea {
-  border: 1px solid #cbd5e1 !important;
-  border-radius: 4px !important;
-  padding: 6px 8px !important;
-  font-size: 0.85rem !important;
+  width: 100% !important;
+  border: 1px solid #94a3b8 !important;
+  border-radius: 3px !important;
+  padding: 4px 6px !important;
+  font-size: 9pt !important;
   color: #000000 !important;
   background-color: #ffffff !important;
-  appearance: none !important;
-  -webkit-appearance: none !important;
+  box-sizing: border-box !important;
 }
 
 body.pdf-mode .signatures-grid {
   display: flex !important;
-  justify-content: space-around !important;
-  gap: 20px !important;
+  justify-content: space-between !important;
+  gap: 15px !important;
   page-break-inside: avoid !important;
   break-inside: avoid !important;
 }
@@ -354,9 +369,9 @@ body.pdf-mode .signature-box {
 }
 
 body.pdf-mode .signature-box img {
-  max-height: 60px !important;
+  max-height: 55px !important;
   width: auto !important;
-  margin: 6px auto 0 auto !important;
+  margin: 4px auto 0 auto !important;
   display: block !important;
 }
 

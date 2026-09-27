@@ -234,7 +234,7 @@
       const protocolType = document.getElementById('protocol-type')?.value || 'Protokół';
       const clientAddress = document.getElementById('client-address')?.value || '';
 
-      // Zapis w bazie lokalnej
+      // Zapis w pamięci
       const newProtocol = {
         id: Date.now(),
         type: protocolType,
@@ -248,7 +248,7 @@
       localStorage.setItem('klima_protocols_db', JSON.stringify(savedProtocols));
       renderCatalog();
 
-      // Konwersja podpisów
+      // Przeniesienie podpisów z Canvas
       const clientCanvas = document.getElementById('client-signature');
       const techCanvas = document.getElementById('installer-signature');
       const clientImg = document.getElementById('pdf-sig-client-img');
@@ -266,15 +266,18 @@
         techCanvas.classList.add('hidden');
       }
 
+      // Włącz nagłówek dokumentu i tryb PDF
+      const pdfHeader = document.querySelector('.pdf-document-header');
+      if (pdfHeader) pdfHeader.classList.remove('hidden');
       document.body.classList.add('pdf-mode');
 
-      const element = document.querySelector('.container');
+      const element = document.getElementById('protocol-form');
       const safeClientName = clientName.replace(/[^a-zA-Z0-9ąĆęŁńÓśŹŻĄĆĘŁŃÓŚŹŻ_-]/g, '_');
       const safeProtocolType = protocolType.replace(/\s+/g, '_');
       const fileName = `${safeProtocolType}_${safeClientName}_${serviceDate}.pdf`;
 
       const opt = {
-        margin:       [8, 8, 8, 8],
+        margin:       [10, 10, 10, 10],
         filename:     fileName,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true, logging: false },
@@ -290,12 +293,13 @@
           cleanupPdfMode();
         })
         .catch((err) => {
-          console.error('Błąd PDF:', err);
+          console.error('Błąd wygenerowania PDF:', err);
           cleanupPdfMode();
         });
 
       function cleanupPdfMode() {
         document.body.classList.remove('pdf-mode');
+        if (pdfHeader) pdfHeader.classList.add('hidden');
 
         if (clientCanvas && clientImg) {
           clientImg.classList.add('hidden');

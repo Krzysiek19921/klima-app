@@ -19,6 +19,11 @@
   <main class="container">
     <form id="protocol-form">
 
+      <!-- NAGŁÓWEK TYLKO DLA DRUKU/PDF -->
+      <div class="pdf-document-header hidden">
+        <h2>Protokół Montażu / Serwisu Klimatyzacji</h2>
+      </div>
+
       <!-- DANE FIRMY / MONTERA -->
       <fieldset class="protocol-section">
         <legend>Dane Wykonawcy / Instalatora</legend>
@@ -159,7 +164,7 @@
       <fieldset class="protocol-section">
         <legend>Zakres Prac i Uwagi</legend>
         <div class="form-group full-width">
-          <textarea id="service-notes" rows="4" placeholder="Opis przeprowadzonych prac, wykonanych prób szczelności, pomiarów temperatur..."></textarea>
+          <textarea id="service-notes" rows="3" placeholder="Opis przeprowadzonych prac, wykonanych prób szczelności, pomiarów temperatur..."></textarea>
         </div>
       </fieldset>
 

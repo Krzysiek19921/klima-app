@@ -173,7 +173,6 @@ async function handleFormSubmit(e) {
   const serviceDate = getValue('service-date');
   const fileName = `Protokol_${clientName.replace(/\s+/g, '_')}_${serviceDate}.pdf`;
 
-  // Przygotowanie widoku A4 bezpośrednio na stronie
   const formElement = document.getElementById('protocol-form');
   const originalHTML = formElement.innerHTML;
 
@@ -259,7 +258,6 @@ async function handleFormSubmit(e) {
     </div>
   `;
 
-  // Przeniesienie widoku do góry strony na czas zapisywania
   window.scrollTo(0, 0);
 
   const opt = {
@@ -278,7 +276,6 @@ async function handleFormSubmit(e) {
     alert('Błąd podczas generowania pliku PDF. Spróbuj ponownie.');
     console.error(err);
   } finally {
-    // Przywrócenie pierwotnego formularza
     formElement.innerHTML = originalHTML;
     setupUnitButtons();
     initCanvas('installer-signature');

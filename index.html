@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Protokó³ Monta¿u / Serwisu Klimatyzacji</title>
+  <title>ProtokÃ³Å‚ MontaÅ¼u / Serwisu Klimatyzacji</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
@@ -11,7 +11,7 @@
 
   <header class="app-header">
     <div class="header-content">
-      <h1>Protokó³ Us³ugi Klimatyzacyjnej</h1>
+      <h1>ProtokÃ³Å‚ UsÅ‚ugi Klimatyzacyjnej</h1>
     </div>
     <p class="subtitle">System generowania oficjalnej dokumentacji technicznej</p>
   </header>
@@ -19,9 +19,9 @@
   <main class="container">
     <form id="protocol-form">
 
-      <!-- NAG£ÓWEK TYLKO DLA DRUKU/PDF -->
+      <!-- NAGÅÃ“WEK TYLKO DLA DRUKU/PDF -->
       <div class="pdf-document-header hidden">
-        <h2>Protokó³ Monta¿u / Serwisu Klimatyzacji</h2>
+        <h2>ProtokÃ³Å‚ MontaÅ¼u / Serwisu Klimatyzacji</h2>
       </div>
 
       <!-- DANE FIRMY / MONTERA -->
@@ -41,7 +41,7 @@
             <input type="text" id="company-address" placeholder="ul. Prosta 10, 00-001 Warszawa">
           </div>
           <div class="form-group">
-            <label for="installer-name">Imiê i nazwisko montera:</label>
+            <label for="installer-name">ImiÄ™ i nazwisko montera:</label>
             <input type="text" id="installer-name" placeholder="Jan Kowalski" required>
           </div>
           <div class="form-group">
@@ -51,55 +51,55 @@
         </div>
       </fieldset>
 
-      <!-- DANE KLIENTA I US£UGI -->
+      <!-- DANE KLIENTA I USÅUGI -->
       <fieldset class="protocol-section">
-        <legend>Dane Klienta i Szczegó³y Us³ugi</legend>
+        <legend>Dane Klienta i SzczegÃ³Å‚y UsÅ‚ugi</legend>
         <div class="form-grid">
           <div class="form-group">
-            <label for="protocol-type">Rodzaj protoko³u:</label>
+            <label for="protocol-type">Rodzaj protokoÅ‚u:</label>
             <select id="protocol-type">
-              <option value="Protokó³ Monta¿u">Protokó³ Monta¿u</option>
-              <option value="Protokó³ Przegl¹du / Serwisu">Protokó³ Przegl¹du / Serwisu</option>
-              <option value="Protokó³ Awarii / Naprawy">Protokó³ Awarii / Naprawy</option>
+              <option value="ProtokÃ³Å‚ MontaÅ¼u">ProtokÃ³Å‚ MontaÅ¼u</option>
+              <option value="ProtokÃ³Å‚ PrzeglÄ…du / Serwisu">ProtokÃ³Å‚ PrzeglÄ…du / Serwisu</option>
+              <option value="ProtokÃ³Å‚ Awarii / Naprawy">ProtokÃ³Å‚ Awarii / Naprawy</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="service-date">Data wykonania us³ugi:</label>
+            <label for="service-date">Data wykonania usÅ‚ugi:</label>
             <input type="date" id="service-date" required>
           </div>
           <div class="form-group">
-            <label for="client-name">Imiê i nazwisko / Firma Klienta:</label>
+            <label for="client-name">ImiÄ™ i nazwisko / Firma Klienta:</label>
             <input type="text" id="client-name" placeholder="Anna Nowak" required>
           </div>
           <div class="form-group">
-            <label for="client-address">Adres monta¿u / serwisu:</label>
-            <input type="text" id="client-address" placeholder="ul. S³oneczna 5, 05-000 Miasto" required>
+            <label for="client-address">Adres montaÅ¼u / serwisu:</label>
+            <input type="text" id="client-address" placeholder="ul. SÅ‚oneczna 5, 05-000 Miasto" required>
           </div>
           <div class="form-group">
-            <label for="next-service-date">Sugerowana data nast. przegl¹du:</label>
+            <label for="next-service-date">Sugerowana data nast. przeglÄ…du:</label>
             <input type="date" id="next-service-date">
           </div>
         </div>
       </fieldset>
 
-      <!-- SPECYFIKACJA URZ¥DZEÑ -->
+      <!-- SPECYFIKACJA URZÄ„DZEÅƒ -->
       <fieldset class="protocol-section">
-        <legend>Specyfikacja Urz¹dzeñ</legend>
+        <legend>Specyfikacja UrzÄ…dzeÅ„</legend>
         
-        <!-- JEDNOSTKI WEWNÊTRZNE -->
+        <!-- JEDNOSTKI WEWNÄ˜TRZNE -->
         <div class="sub-section-title">
-          <span>Jednostki Wewnêtrzne</span>
-          <button type="button" id="add-indoor-btn" class="btn-add">+ Dodaj jednostkê wewn.</button>
+          <span>Jednostki WewnÄ™trzne</span>
+          <button type="button" id="add-indoor-btn" class="btn-add">+ Dodaj jednostkÄ™ wewn.</button>
         </div>
         <div id="indoor-units-container">
           <div class="card-box indoor-card">
             <div class="card-header">
-              <strong>Jednostka Wewnêtrzna #1</strong>
-              <button type="button" class="btn-remove" title="Usuñ jednostkê">Usuñ</button>
+              <strong>Jednostka WewnÄ™trzna #1</strong>
+              <button type="button" class="btn-remove" title="UsuÅ„ jednostkÄ™">UsuÅ„</button>
             </div>
             <div class="form-grid">
               <div class="form-group full-width">
-                <label>Model urz¹dzenia:</label>
+                <label>Model urzÄ…dzenia:</label>
                 <input type="text" class="indoor-model" placeholder="np. Rotenso Mirai 3.5 kW" required>
               </div>
               <div class="form-group full-width">
@@ -110,20 +110,20 @@
           </div>
         </div>
 
-        <!-- JEDNOSTKI ZEWNÊTRZNE -->
+        <!-- JEDNOSTKI ZEWNÄ˜TRZNE -->
         <div class="sub-section-title" style="margin-top: 20px;">
-          <span>Jednostki Zewnêtrzne</span>
-          <button type="button" id="add-outdoor-btn" class="btn-add">+ Dodaj jednostkê zewn.</button>
+          <span>Jednostki ZewnÄ™trzne</span>
+          <button type="button" id="add-outdoor-btn" class="btn-add">+ Dodaj jednostkÄ™ zewn.</button>
         </div>
         <div id="outdoor-units-container">
           <div class="card-box outdoor-card">
             <div class="card-header">
-              <strong>Jednostka Zewnêtrzna #1</strong>
-              <button type="button" class="btn-remove" title="Usuñ jednostkê">Usuñ</button>
+              <strong>Jednostka ZewnÄ™trzna #1</strong>
+              <button type="button" class="btn-remove" title="UsuÅ„ jednostkÄ™">UsuÅ„</button>
             </div>
             <div class="form-grid">
               <div class="form-group full-width">
-                <label>Model urz¹dzenia:</label>
+                <label>Model urzÄ…dzenia:</label>
                 <input type="text" class="outdoor-model" placeholder="np. Rotenso Mirai 3.5 kW Outer" required>
               </div>
               <div class="form-group full-width">
@@ -137,7 +137,7 @@
 
       <!-- PARAMETRY CZYNNIKA I CRO -->
       <fieldset class="protocol-section">
-        <legend>Parametry Czynnika Ch³odniczego i CRO</legend>
+        <legend>Parametry Czynnika ChÅ‚odniczego i CRO</legend>
         <div class="form-grid">
           <div class="form-group">
             <label for="refrigerant-type">Rodzaj gazu / czynnika:</label>
@@ -150,22 +150,22 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="refrigerant-base-amount">Iloœæ czynnika fabryczna (kg):</label>
+            <label for="refrigerant-base-amount">IloÅ›Ä‡ czynnika fabryczna (kg):</label>
             <input type="text" id="refrigerant-base-amount" placeholder="np. 0.85 kg">
           </div>
           <div class="form-group">
-            <label for="refrigerant-added-amount">Iloœæ dodanego czynnika (kg):</label>
+            <label for="refrigerant-added-amount">IloÅ›Ä‡ dodanego czynnika (kg):</label>
             <input type="text" id="refrigerant-added-amount" placeholder="np. 0.15 kg (lub 0)">
           </div>
           <div class="form-group">
             <label for="cro-status">Podlega pod rejestr CRO:</label>
             <select id="cro-status">
-              <option value="NIE - Poni¿ej progu (5 t CO2 eq)">NIE - Poni¿ej progu (5 t CO2 eq)</option>
+              <option value="NIE - PoniÅ¼ej progu (5 t CO2 eq)">NIE - PoniÅ¼ej progu (5 t CO2 eq)</option>
               <option value="TAK - Wymaga wpisu do CRO">TAK - Wymaga wpisu do CRO</option>
             </select>
           </div>
           <div class="form-group full-width">
-            <label for="cro-number">Numer karty urz¹dzenia w CRO (jeœli dotyczy):</label>
+            <label for="cro-number">Numer karty urzÄ…dzenia w CRO (jeÅ›li dotyczy):</label>
             <input type="text" id="cro-number" placeholder="np. CRO/2026/001234">
           </div>
         </div>
@@ -175,17 +175,17 @@
       <fieldset class="protocol-section">
         <legend>Zakres Prac i Uwagi</legend>
         <div class="form-group full-width">
-          <textarea id="service-notes" rows="3" placeholder="Opis przeprowadzonych prac, wykonanych prób szczelnoœci, pomiarów temperatur..."></textarea>
+          <textarea id="service-notes" rows="3" placeholder="Opis przeprowadzonych prac, wykonanych prÃ³b szczelnoÅ›ci, pomiarÃ³w temperatur..."></textarea>
         </div>
       </fieldset>
 
-      <!-- POTWIERDZENIA I OŒWIADCZENIA -->
+      <!-- POTWIERDZENIA I OÅšWIADCZENIA -->
       <fieldset class="protocol-section">
-        <legend>Oœwiadczenia i Potwierdzenia</legend>
+        <legend>OÅ›wiadczenia i Potwierdzenia</legend>
         <div class="statements-list">
-          <p>? Potwierdzam prawid³owy monta¿ urz¹dzenia oraz przeprowadzenie próby szczelnoœci i pró¿ni.</p>
-          <p>? Urz¹dzenie zosta³o uruchomione i przetestowane – dzia³a prawid³owo.</p>
-          <p>? Klient zosta³ zapoznany z zasadami obs³ugi urz¹dzenia, warunkami gwarancji oraz wymogami przegl¹dów okresowych.</p>
+          <p>? Potwierdzam prawidÅ‚owy montaÅ¼ urzÄ…dzenia oraz przeprowadzenie prÃ³by szczelnoÅ›ci i prÃ³Å¼ni.</p>
+          <p>? UrzÄ…dzenie zostaÅ‚o uruchomione i przetestowane â€“ dziaÅ‚a prawidÅ‚owo.</p>
+          <p>? Klient zostaÅ‚ zapoznany z zasadami obsÅ‚ugi urzÄ…dzenia, warunkami gwarancji oraz wymogami przeglÄ…dÃ³w okresowych.</p>
         </div>
       </fieldset>
 
@@ -197,14 +197,14 @@
             <label>Podpis Serwisanta / Montera</label>
             <canvas id="installer-signature" width="300" height="120"></canvas>
             <img id="pdf-sig-tech-img" class="hidden" alt="Podpis instalatora">
-            <button type="button" class="btn-clear" onclick="clearCanvas('installer-signature')">Wyczyœæ</button>
+            <button type="button" class="btn-clear" onclick="clearCanvas('installer-signature')">WyczyÅ›Ä‡</button>
           </div>
 
           <div class="signature-box">
             <label>Podpis Klienta</label>
             <canvas id="client-signature" width="300" height="120"></canvas>
             <img id="pdf-sig-client-img" class="hidden" alt="Podpis klienta">
-            <button type="button" class="btn-clear" onclick="clearCanvas('client-signature')">Wyczyœæ</button>
+            <button type="button" class="btn-clear" onclick="clearCanvas('client-signature')">WyczyÅ›Ä‡</button>
           </div>
         </div>
       </fieldset>
@@ -215,13 +215,13 @@
 
     </form>
 
-    <!-- KATALOG ZAPISANYCH PROTOKO£ÓW -->
+    <!-- KATALOG ZAPISANYCH PROTOKOÅÃ“W -->
     <section class="catalog-section">
-      <h3 class="catalog-title">Rejestr Zapisanych Protoko³ów</h3>
+      <h3 class="catalog-title">Rejestr Zapisanych ProtokoÅ‚Ã³w</h3>
       <div id="catalog-list" class="catalog-list"></div>
     </section>
   </main>
 
-  <script src="js/main.js?v=99"></script>
+  <script src="js/main.js?v=200" charset="UTF-8"></script>
 </body>
 </html>

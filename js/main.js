@@ -31,13 +31,21 @@ function setupUnitButtons() {
           <button type="button" class="btn-remove" onclick="this.closest('.card-box').remove()">Usuń</button>
         </div>
         <div class="form-grid">
-          <div class="form-group full-width">
-            <label>Model urządzenia:</label>
-            <input type="text" class="indoor-model" placeholder="np. Rotenso Mirai 3.5 kW" required>
+          <div class="form-group">
+            <label>Marka / Producent:</label>
+            <input type="text" class="indoor-brand" placeholder="np. Rotenso">
           </div>
-          <div class="form-group full-width">
+          <div class="form-group">
+            <label>Model urządzenia:</label>
+            <input type="text" class="indoor-model" placeholder="np. Mirai 3.5 kW" required>
+          </div>
+          <div class="form-group">
             <label>Numer seryjny:</label>
             <input type="text" class="indoor-serial" placeholder="np. SN-IN-987654321">
+          </div>
+          <div class="form-group">
+            <label>Data produkcji:</label>
+            <input type="text" class="indoor-mfg-date" placeholder="np. 2024 / ROK">
           </div>
         </div>
       `;
@@ -57,13 +65,21 @@ function setupUnitButtons() {
           <button type="button" class="btn-remove" onclick="this.closest('.card-box').remove()">Usuń</button>
         </div>
         <div class="form-grid">
-          <div class="form-group full-width">
-            <label>Model urządzenia:</label>
-            <input type="text" class="outdoor-model" placeholder="np. Rotenso Mirai 3.5 kW Outer" required>
+          <div class="form-group">
+            <label>Marka / Producent:</label>
+            <input type="text" class="outdoor-brand" placeholder="np. Rotenso">
           </div>
-          <div class="form-group full-width">
+          <div class="form-group">
+            <label>Model urządzenia:</label>
+            <input type="text" class="outdoor-model" placeholder="np. Mirai 3.5 kW Outer" required>
+          </div>
+          <div class="form-group">
             <label>Numer seryjny:</label>
             <input type="text" class="outdoor-serial" placeholder="np. SN-OUT-123456789">
+          </div>
+          <div class="form-group">
+            <label>Data produkcji:</label>
+            <input type="text" class="outdoor-mfg-date" placeholder="np. 2024 / ROK">
           </div>
         </div>
       `;
@@ -148,11 +164,13 @@ async function handleFormSubmit(e) {
   const indoorCards = document.querySelectorAll('.indoor-card');
   let indoorHTML = '';
   indoorCards.forEach((card, i) => {
+    const brand = card.querySelector('.indoor-brand')?.value || '—';
     const model = card.querySelector('.indoor-model')?.value || '—';
     const serial = card.querySelector('.indoor-serial')?.value || '—';
+    const mfgDate = card.querySelector('.indoor-mfg-date')?.value || '—';
     indoorHTML += `
       <div style="margin-bottom: 2px;">
-        <b>Jednostka Wewn. #${i + 1}:</b> ${model} | <b>S/N:</b> ${serial}
+        <b>Jednostka Wewn. #${i + 1}:</b> ${brand} ${model} | <b>S/N:</b> ${serial} | <b>Data prod.:</b> ${mfgDate}
       </div>
     `;
   });
@@ -160,11 +178,13 @@ async function handleFormSubmit(e) {
   const outdoorCards = document.querySelectorAll('.outdoor-card');
   let outdoorHTML = '';
   outdoorCards.forEach((card, i) => {
+    const brand = card.querySelector('.outdoor-brand')?.value || '—';
     const model = card.querySelector('.outdoor-model')?.value || '—';
     const serial = card.querySelector('.outdoor-serial')?.value || '—';
+    const mfgDate = card.querySelector('.outdoor-mfg-date')?.value || '—';
     outdoorHTML += `
       <div style="margin-bottom: 2px;">
-        <b>Jednostka Zewn. #${i + 1}:</b> ${model} | <b>S/N:</b> ${serial}
+        <b>Jednostka Zewn. #${i + 1}:</b> ${brand} ${model} | <b>S/N:</b> ${serial} | <b>Data prod.:</b> ${mfgDate}
       </div>
     `;
   });

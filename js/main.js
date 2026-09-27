@@ -1,11 +1,110 @@
 ﻿document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('protocol-form');
 
-  // Ustawienie domyślnej dzisiejszej daty w polu daty wykonania usługi
+  // --- 0. DATY I AUTOMATYCZNY TERMIN PRZEGLĄDU ---
   const serviceDateInput = document.getElementById('service-date');
-  if (serviceDateInput && !serviceDateInput.value) {
-    serviceDateInput.value = new Date().toISOString().slice(0, 10);
+  const nextDateInput = document.getElementById('next-service-date');
+
+  if (serviceDateInput) {
+    if (!serviceDateInput.value) {
+      const today = new Date();
+      serviceDateInput.value = today.toISOString().slice(0, 10);
+      
+      if (nextDateInput && !nextDateInput.value) {
+        const nextYear = new Date(today);
+        nextYear.setFullYear(today.getFullYear() + 1);
+        nextDateInput.value = nextYear.toISOString().slice(0, 10);
+      }
+    }
+
+    serviceDateInput.addEventListener('change', () => {
+      if (serviceDateInput.value && nextDateInput) {
+        const selectedDate = new Date(serviceDateInput.value);
+        if (!isNaN(selectedDate.getTime())) {
+          selectedDate.setFullYear(selectedDate.getFullYear() + 1);
+          nextDateInput.value = selectedDate.toISOString().slice(0, 10);
+        }
+      }
+    });
   }
+
+  // --- OBSŁUGA OBSZARU RYSOWANIA PODPISÓW (CANVAS) ---
+  const setupSignatureCanvas = (canvasId) => {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000000';
+
+    const getPos = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    };
+
+    const startDrawing = (e) => {
+      isDrawing = true;
+      const pos = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+    };
+
+    const draw = (e) => {
+      if (!isDrawing) return;
+      const pos = getPos(e);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    };
+
+    const stopDrawing = () => {
+      isDrawing = false;
+    };
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+    canvas.addEventListener('touchend', stopDrawing);
+  };
+
+  setupSignatureCanvas('installer-signature');
+  setupSignatureCanvas('client-signature');
+
+  window.clearCanvas = (canvasId) => {
+    const canvas = document.getElementById(canvasId);
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  };
+
+  // --- ZAPAMIĘTYWANIE DANYCH FIRMY I INSTALATORA ---
+  const persistentFields = [
+    'company-name', 'company-nip', 'company-address', 'installer-name', 'fgaz-cert'
+  ];
+
+  persistentFields.forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      const savedValue = localStorage.getItem('klima_' + id);
+      if (savedValue !== null) {
+        input.value = savedValue;
+      }
+      input.addEventListener('input', (e) => {
+        localStorage.setItem('klima_' + id, e.target.value);
+      });
+    }
+  });
 
   // --- 1. DYNAMICZNE DODAWANIE / USUWANIE JEDNOSTEK ---
   const indoorContainer = document.getElementById('indoor-units-container');
@@ -13,7 +112,6 @@
   const addIndoorBtn = document.getElementById('add-indoor-btn');
   const addOutdoorBtn = document.getElementById('add-outdoor-btn');
 
-  // Funkcja aktualizująca numerację na kafelkach po usunięciu
   function reindexUnits(container, titlePrefix) {
     if (!container) return;
     const cards = container.querySelectorAll('.card-box');
@@ -25,10 +123,9 @@
     });
   }
 
-  // Dodawanie nowej jednostki wewnętrznej
   if (addIndoorBtn && indoorContainer) {
     addIndoorBtn.addEventListener('click', () => {
-      const count = indoorContainer.children.length + 1;
+      const count = indoorContainer.querySelectorAll('.indoor-card').length + 1;
       const card = document.createElement('div');
       card.className = 'card-box indoor-card';
       card.innerHTML = `
@@ -48,14 +145,12 @@
         </div>
       `;
       indoorContainer.appendChild(card);
-      if (window.lucide) window.lucide.createIcons();
     });
   }
 
-  // Dodawanie nowej jednostki zewnętrznej
   if (addOutdoorBtn && outdoorContainer) {
     addOutdoorBtn.addEventListener('click', () => {
-      const count = outdoorContainer.children.length + 1;
+      const count = outdoorContainer.querySelectorAll('.outdoor-card').length + 1;
       const card = document.createElement('div');
       card.className = 'card-box outdoor-card';
       card.innerHTML = `
@@ -75,11 +170,9 @@
         </div>
       `;
       outdoorContainer.appendChild(card);
-      if (window.lucide) window.lucide.createIcons();
     });
   }
 
-  // Obsługa usuwania kafelków i odświeżania numeracji
   document.addEventListener('click', (e) => {
     const removeBtn = e.target.closest('.btn-remove');
     if (removeBtn) {
@@ -97,12 +190,65 @@
     }
   });
 
-  // --- 2. GENEROWANIE DOKUMENTU PDF ---
+  // --- 2. LOGIKA KATALOGU PROTOKOŁÓW ---
+  const renderCatalog = () => {
+    const catalogList = document.getElementById('catalog-list');
+    if (!catalogList) return;
+
+    const savedProtocols = JSON.parse(localStorage.getItem('klima_protocols_db') || '[]');
+
+    if (savedProtocols.length === 0) {
+      catalogList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Brak zapisanych protokołów w pamięci.</p>';
+      return;
+    }
+
+    catalogList.innerHTML = savedProtocols.map((item, index) => `
+      <div class="catalog-item">
+        <div class="catalog-info">
+          <h4>${item.type} - ${item.clientName}</h4>
+          <p>Data: ${item.date} | Adres: ${item.address}</p>
+        </div>
+        <div class="catalog-actions">
+          <button type="button" class="btn-delete-item" onclick="deleteProtocol(${index})">Usuń</button>
+        </div>
+      </div>
+    `).join('');
+  };
+
+  window.deleteProtocol = (index) => {
+    let savedProtocols = JSON.parse(localStorage.getItem('klima_protocols_db') || '[]');
+    savedProtocols.splice(index, 1);
+    localStorage.setItem('klima_protocols_db', JSON.stringify(savedProtocols));
+    renderCatalog();
+  };
+
+  renderCatalog();
+
+  // --- 3. GENEROWANIE DOKUMENTU PDF ORAZ ZAPIS W KATALOGU ---
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      // Przygotowanie podpisów: Przeniesienie z Canvas do IMG przed wygenerowaniem PDF
+      const clientName = document.getElementById('client-name')?.value.trim() || 'Klient';
+      const serviceDate = document.getElementById('service-date')?.value || new Date().toISOString().slice(0, 10);
+      const protocolType = document.getElementById('protocol-type')?.value || 'Protokół';
+      const clientAddress = document.getElementById('client-address')?.value || '';
+
+      // Zapis w katalogu
+      const newProtocol = {
+        id: Date.now(),
+        type: protocolType,
+        clientName: clientName,
+        date: serviceDate,
+        address: clientAddress
+      };
+
+      const savedProtocols = JSON.parse(localStorage.getItem('klima_protocols_db') || '[]');
+      savedProtocols.unshift(newProtocol);
+      localStorage.setItem('klima_protocols_db', JSON.stringify(savedProtocols));
+      renderCatalog();
+
+      // Przenoszenie podpisów Canvas do <img>
       const clientCanvas = document.getElementById('client-signature');
       const techCanvas = document.getElementById('installer-signature');
       const clientImg = document.getElementById('pdf-sig-client-img');
@@ -120,16 +266,13 @@
         techCanvas.classList.add('hidden');
       }
 
-      // Aktywacja trybu PDF
       document.body.classList.add('pdf-mode');
 
       const element = document.querySelector('.container');
-      const clientName = document.getElementById('client-name')?.value.trim() || 'Klient';
-      const serviceDate = document.getElementById('service-date')?.value || new Date().toISOString().slice(0, 10);
       const safeClientName = clientName.replace(/[^a-zA-Z0-9ąĆęŁńÓśŹŻĄĆĘŁŃÓŚŹŻ_-]/g, '_');
-      const fileName = `Protokol_${safeClientName}_${serviceDate}.pdf`;
+      const safeProtocolType = protocolType.replace(/\s+/g, '_');
+      const fileName = `${safeProtocolType}_${safeClientName}_${serviceDate}.pdf`;
 
-      // Konfiguracja PDF
       const opt = {
         margin: [8, 8, 8, 8],
         filename: fileName,
@@ -139,7 +282,6 @@
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
-      // Wygenerowanie pliku PDF i przywrócenie domyślnego widoku
       html2pdf()
         .set(opt)
         .from(element)
@@ -148,11 +290,11 @@
           cleanupPdfMode();
         })
         .catch((err) => {
-          console.error('Błąd podczas generowania PDF:', err);
+          console.error('Błąd generowania PDF:', err);
           cleanupPdfMode();
+          alert('Wystąpił błąd podczas generowania pliku PDF.');
         });
 
-      // Funkcja czyszcząca widok po wygenerowaniu pliku
       function cleanupPdfMode() {
         document.body.classList.remove('pdf-mode');
 

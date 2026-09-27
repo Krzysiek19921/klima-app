@@ -135,9 +135,9 @@
         </div>
       </fieldset>
 
-      <!-- PARAMETRY CZYNNIKA CHŁODNICZEGO (F-GAZ) -->
+      <!-- PARAMETRY CZYNNIKA I CRO -->
       <fieldset class="protocol-section">
-        <legend>Parametry Czynnika Chłodniczego (F-Gaz)</legend>
+        <legend>Parametry Czynnika Chłodniczego i CRO</legend>
         <div class="form-grid">
           <div class="form-group">
             <label for="refrigerant-type">Rodzaj gazu / czynnika:</label>
@@ -157,6 +157,17 @@
             <label for="refrigerant-added-amount">Ilość dodanego czynnika (kg):</label>
             <input type="text" id="refrigerant-added-amount" placeholder="np. 0.15 kg (lub 0)">
           </div>
+          <div class="form-group">
+            <label for="cro-status">Podlega pod rejestr CRO:</label>
+            <select id="cro-status">
+              <option value="NIE - Poniżej progu (5 t CO2 eq)">NIE - Poniżej progu (5 t CO2 eq)</option>
+              <option value="TAK - Wymaga wpisu do CRO">TAK - Wymaga wpisu do CRO</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label for="cro-number">Numer karty urządzenia w CRO (jeśli dotyczy):</label>
+            <input type="text" id="cro-number" placeholder="np. CRO/2026/001234">
+          </div>
         </div>
       </fieldset>
 
@@ -168,9 +179,19 @@
         </div>
       </fieldset>
 
+      <!-- POTWIERDZENIA I OŚWIADCZENIA -->
+      <fieldset class="protocol-section">
+        <legend>Oświadczenia i Potwierdzenia</legend>
+        <div class="statements-list">
+          <p>✔ Potwierdzam prawidłowy montaż urządzenia oraz przeprowadzenie próby szczelności i próżni.</p>
+          <p>✔ Urządzenie zostało uruchomione i przetestowane – działa prawidłowo.</p>
+          <p>✔ Klient został zapoznany z zasadami obsługi urządzenia, warunkami gwarancji oraz wymogami przeglądów okresowych.</p>
+        </div>
+      </fieldset>
+
       <!-- PODPISY -->
       <fieldset class="protocol-section">
-        <legend>Oświadczenie i Podpisy</legend>
+        <legend>Podpisy Stron</legend>
         <div class="signatures-grid">
           <div class="signature-box">
             <label>Podpis Serwisanta / Montera</label>

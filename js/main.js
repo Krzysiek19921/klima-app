@@ -234,7 +234,7 @@
       const protocolType = document.getElementById('protocol-type')?.value || 'Protokół';
       const clientAddress = document.getElementById('client-address')?.value || '';
 
-      // Zapis do bazy
+      // Zapis w bazie lokalnej
       const newProtocol = {
         id: Date.now(),
         type: protocolType,
@@ -248,7 +248,7 @@
       localStorage.setItem('klima_protocols_db', JSON.stringify(savedProtocols));
       renderCatalog();
 
-      // Przeniesienie podpisów z Canvas do Obrazka
+      // Konwersja podpisów
       const clientCanvas = document.getElementById('client-signature');
       const techCanvas = document.getElementById('installer-signature');
       const clientImg = document.getElementById('pdf-sig-client-img');
@@ -274,7 +274,7 @@
       const fileName = `${safeProtocolType}_${safeClientName}_${serviceDate}.pdf`;
 
       const opt = {
-        margin:       [10, 10, 10, 10],
+        margin:       [8, 8, 8, 8],
         filename:     fileName,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true, logging: false },
@@ -290,9 +290,8 @@
           cleanupPdfMode();
         })
         .catch((err) => {
-          console.error('Błąd generowania PDF:', err);
+          console.error('Błąd PDF:', err);
           cleanupPdfMode();
-          alert('Wystąpił błąd podczas generowania pliku PDF.');
         });
 
       function cleanupPdfMode() {

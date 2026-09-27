@@ -1,23 +1,17 @@
 ﻿document.addEventListener('DOMContentLoaded', () => {
-  // Domyślna data dzisiejsza
   const today = new Date().toISOString().split('T')[0];
   const serviceDateInput = document.getElementById('service-date');
   if (serviceDateInput) serviceDateInput.value = today;
 
-  // Obsługa dynamicznych jednostek
   setupUnitButtons();
-
-  // Obsługa podpisów Canvas
   initCanvas('installer-signature');
   initCanvas('client-signature');
 
-  // Obsługa formularza i generowania PDF
   const form = document.getElementById('protocol-form');
   if (form) {
     form.addEventListener('submit', handleFormSubmit);
   }
 
-  // Wczytaj katalog
   renderCatalog();
 });
 
@@ -78,7 +72,6 @@ function setupUnitButtons() {
   }
 }
 
-// Rysowanie na Canvas
 function initCanvas(canvasId) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
@@ -134,67 +127,162 @@ function clearCanvas(canvasId) {
   }
 }
 
-// Przepisanie wartości z kontrolek HTML (w tym <select> i <textarea>) do właściwości domyślnych dla HTML2PDF
-function syncFormInputsForPDF() {
-  const inputs = document.querySelectorAll('input, select, textarea');
-  inputs.forEach(input => {
-    if (input.tagName === 'SELECT') {
-      const selectedOption = input.options[input.selectedIndex];
-      if (selectedOption) {
-        Array.from(input.options).forEach(opt => opt.removeAttribute('selected'));
-        selectedOption.setAttribute('selected', 'selected');
-      }
-    } else if (input.tagName === 'TEXTAREA') {
-      input.textContent = input.value;
-    } else {
-      input.setAttribute('value', input.value);
-    }
-  });
-
-  // Przekształcenie podpisów z Canvas na obrazy IMG
-  ['installer-signature', 'client-signature'].forEach(id => {
-    const canvas = document.getElementById(id);
-    const imgId = id === 'installer-signature' ? 'pdf-sig-tech-img' : 'pdf-sig-client-img';
-    const img = document.getElementById(imgId);
-    if (canvas && img) {
-      img.src = canvas.toDataURL('image/png');
-      img.classList.remove('hidden');
-    }
-  });
-}
-
 async function handleFormSubmit(e) {
   e.preventDefault();
 
-  // Synchronizacja wartości przed generowaniem PDF
-  syncFormInputsForPDF();
+  const getValue = (id) => {
+    const el = document.getElementById(id);
+    return el ? (el.value || '—') : '—';
+  };
 
-  const clientName = document.getElementById('client-name').value || 'Klient';
-  const serviceDate = document.getElementById('service-date').value || new Date().toISOString().split('T')[0];
+  const getSelectText = (id) => {
+    const el = document.getElementById(id);
+    return el && el.selectedIndex !== -1 ? el.options[el.selectedIndex].text : '—';
+  };
+
+  // Pobranie podpisów z Canvas
+  const installerCanvas = document.getElementById('installer-signature');
+  const clientCanvas = document.getElementById('client-signature');
+  const installerSigImg = installerCanvas ? installerCanvas.toDataURL('image/png') : '';
+  const clientSigImg = clientCanvas ? clientCanvas.toDataURL('image/png') : '';
+
+  // Zbierz jednostki wewnętrzne
+  const indoorCards = document.querySelectorAll('.indoor-card');
+  let indoorHTML = '';
+  indoorCards.forEach((card, i) => {
+    const model = card.querySelector('.indoor-model')?.value || '—';
+    const serial = card.querySelector('.indoor-serial')?.value || '—';
+    indoorHTML += `
+      <div style="margin-bottom: 4px;">
+        <strong>Jednostka Wewn. #${i + 1}:</strong> ${model} | <strong>S/N:</strong> ${serial}
+      </div>
+    `;
+  });
+
+  // Zbierz jednostki zewnętrzne
+  const outdoorCards = document.querySelectorAll('.outdoor-card');
+  let outdoorHTML = '';
+  outdoorCards.forEach((card, i) => {
+    const model = card.querySelector('.outdoor-model')?.value || '—';
+    const serial = card.querySelector('.outdoor-serial')?.value || '—';
+    outdoorHTML += `
+      <div style="margin-bottom: 4px;">
+        <strong>Jednostka Zewn. #${i + 1}:</strong> ${model} | <strong>S/N:</strong> ${serial}
+      </div>
+    `;
+  });
+
+  const clientName = getValue('client-name');
+  const serviceDate = getValue('service-date');
   const fileName = `Protokol_${clientName.replace(/\s+/g, '_')}_${serviceDate}.pdf`;
 
-  document.body.classList.add('pdf-mode');
+  // Stwórz tymczasowy element HTML specjalnie sformatowany dla idealnego wydruku PDF (A4)
+  const printElement = document.createElement('div');
+  printElement.style.padding = '0';
+  printElement.style.fontFamily = 'Arial, sans-serif';
+  printElement.style.color = '#000000';
+  printElement.style.fontSize = '9pt';
+  printElement.style.lineHeight = '1.3';
 
-  const element = document.getElementById('protocol-form');
+  printElement.innerHTML = `
+    <div style="text-align: center; border-bottom: 2px solid #0284c7; padding-bottom: 4px; margin-bottom: 8px;">
+      <h2 style="font-size: 14pt; color: #0284c7; text-transform: uppercase; margin: 0;">${getSelectText('protocol-type')}</h2>
+    </div>
+
+    <!-- DANNE FIRMY I KLIENTA -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px;">
+      <tr>
+        <td style="width: 50%; vertical-align: top; padding-right: 6px;">
+          <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px;">
+            <strong style="color: #0284c7; display: block; margin-bottom: 4px; font-size: 9.5pt;">WYKONAWCA / INSTALATOR</strong>
+            <b>Firma:</b> ${getValue('company-name')}<br>
+            <b>NIP:</b> ${getValue('company-nip')}<br>
+            <b>Adres:</b> ${getValue('company-address')}<br>
+            <b>Monter:</b> ${getValue('installer-name')}<br>
+            <b>Certyfikat F-Gaz:</b> ${getValue('fgaz-cert')}
+          </div>
+        </td>
+        <td style="width: 50%; vertical-align: top; padding-left: 6px;">
+          <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px;">
+            <strong style="color: #0284c7; display: block; margin-bottom: 4px; font-size: 9.5pt;">ZLECENIODAWCA / KLIENT</strong>
+            <b>Klient:</b> ${clientName}<br>
+            <b>Adres montażu/serwisu:</b> ${getValue('client-address')}<br>
+            <b>Data wykonania usługi:</b> ${serviceDate}<br>
+            <b>Sugerowany nast. przegląd:</b> ${getValue('next-service-date')}
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- SPECYFIKACJA URZĄDZEŃ -->
+    <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; margin-bottom: 8px;">
+      <strong style="color: #0284c7; display: block; margin-bottom: 4px; font-size: 9.5pt;">SPECYFIKACJA URZĄDZEŃ</strong>
+      ${indoorHTML}
+      ${outdoorHTML}
+    </div>
+
+    <!-- CZYNNIK CHŁODNICZY I CRO -->
+    <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; margin-bottom: 8px;">
+      <strong style="color: #0284c7; display: block; margin-bottom: 4px; font-size: 9.5pt;">PARAMETRY CZYNNIKA CHŁODNICZEGO I CRO</strong>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="width: 50%;"><b>Rodzaj czynnika:</b> ${getSelectText('refrigerant-type')}</td>
+          <td style="width: 50%;"><b>Ilość fabryczna:</b> ${getValue('refrigerant-base-amount')} kg</td>
+        </tr>
+        <tr>
+          <td><b>Ilość dodana:</b> ${getValue('refrigerant-added-amount')} kg</td>
+          <td><b>Podlega pod CRO:</b> ${getSelectText('cro-status')}</td>
+        </tr>
+        ${getValue('cro-number') !== '—' ? `<tr><td colspan="2"><b>Nr karty CRO:</b> ${getValue('cro-number')}</td></tr>` : ''}
+      </table>
+    </div>
+
+    <!-- UWAGI -->
+    <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; margin-bottom: 8px;">
+      <strong style="color: #0284c7; display: block; margin-bottom: 2px; font-size: 9.5pt;">OPIS PRAC I UWAGI</strong>
+      <div>${getValue('service-notes')}</div>
+    </div>
+
+    <!-- OŚWIADCZENIA -->
+    <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; margin-bottom: 8px; font-size: 8pt; background: #f8fafc;">
+      <strong style="color: #0284c7; display: block; margin-bottom: 2px; font-size: 8.5pt;">OŚWIADCZENIA I POTWIERDZENIA</strong>
+      <div>✔ Potwierdzam prawidłowy montaż urządzenia oraz przeprowadzenie próby szczelności i próżni.</div>
+      <div>✔ Urządzenie zostało uruchomione i przetestowane – działa prawidłowo.</div>
+      <div>✔ Klient został zapoznany z zasadami obsługi urządzenia, warunkami gwarancji oraz wymogami przeglądów.</div>
+    </div>
+
+    <!-- PODPISY -->
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+      <tr>
+        <td style="width: 50%; text-align: center; padding-right: 10px;">
+          <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; min-height: 70px;">
+            <div style="font-size: 8pt; font-weight: bold; color: #475569; margin-bottom: 4px;">PODPIS SERWISANTA / MONTERA</div>
+            ${installerSigImg ? `<img src="${installerSigImg}" style="max-height: 45px; width: auto;">` : ''}
+          </div>
+        </td>
+        <td style="width: 50%; text-align: center; padding-left: 10px;">
+          <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; min-height: 70px;">
+            <div style="font-size: 8pt; font-weight: bold; color: #475569; margin-bottom: 4px;">PODPIS KLIENTA</div>
+            ${clientSigImg ? `<img src="${clientSigImg}" style="max-height: 45px; width: auto;">` : ''}
+          </div>
+        </td>
+      </tr>
+    </table>
+  `;
+
   const opt = {
-    margin: [8, 8, 8, 8],
+    margin: [6, 8, 6, 8],
     filename: fileName,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+    html2canvas: { scale: 2, useCORS: true },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
   try {
-    await html2pdf().set(opt).from(element).save();
+    await html2pdf().set(opt).from(printElement).save();
     saveProtocolToStorage(clientName, serviceDate, fileName);
   } catch (err) {
     console.error('Błąd generowania PDF:', err);
-  } finally {
-    document.body.classList.remove('pdf-mode');
-    
-    // Ukryj obrazki podpisów po wygenerowaniu PDF
-    document.getElementById('pdf-sig-tech-img')?.classList.add('hidden');
-    document.getElementById('pdf-sig-client-img')?.classList.add('hidden');
   }
 }
 

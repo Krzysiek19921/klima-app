@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Protokół Montażu / Serwisu Klimatyzacji</title>
   <link rel="stylesheet" href="css/style.css">
-  <!-- html2pdf library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
@@ -78,7 +77,7 @@
         </div>
       </fieldset>
 
-      <!-- SPECIFIKACJA URZĄDZEŃ -->
+      <!-- SPECYFIKACJA URZĄDZEŃ -->
       <fieldset class="protocol-section">
         <legend>Specyfikacja Urządzeń</legend>
         
@@ -131,6 +130,31 @@
         </div>
       </fieldset>
 
+      <!-- PARAMETRY CZYNNIKA CHŁODNICZEGO (F-GAZ) -->
+      <fieldset class="protocol-section">
+        <legend>Parametry Czynnika Chłodniczego (F-Gaz)</legend>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="refrigerant-type">Rodzaj gazu / czynnika:</label>
+            <select id="refrigerant-type">
+              <option value="R32">R32</option>
+              <option value="R410A">R410A</option>
+              <option value="R134a">R134a</option>
+              <option value="R407C">R407C</option>
+              <option value="Inny">Inny</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="refrigerant-base-amount">Ilość czynnika fabryczna (kg):</label>
+            <input type="number" step="0.01" id="refrigerant-base-amount" placeholder="np. 0.85">
+          </div>
+          <div class="form-group">
+            <label for="refrigerant-added-amount">Ilość dodanego czynnika (kg):</label>
+            <input type="number" step="0.01" id="refrigerant-added-amount" placeholder="np. 0.15 (0 jeśli nie dodawano)">
+          </div>
+        </div>
+      </fieldset>
+
       <!-- UWAGI / OPIS PRAC -->
       <fieldset class="protocol-section">
         <legend>Zakres Prac i Uwagi</legend>
@@ -143,7 +167,6 @@
       <fieldset class="protocol-section">
         <legend>Oświadczenie i Podpisy</legend>
         <div class="signatures-grid">
-          
           <div class="signature-box">
             <label>Podpis Serwisanta / Montera</label>
             <canvas id="installer-signature" width="300" height="120"></canvas>
@@ -157,7 +180,6 @@
             <img id="pdf-sig-client-img" class="hidden" alt="Podpis klienta">
             <button type="button" class="btn-clear" onclick="clearCanvas('client-signature')">Wyczyść</button>
           </div>
-
         </div>
       </fieldset>
 
@@ -170,9 +192,7 @@
     <!-- KATALOG ZAPISANYCH PROTOKOŁÓW -->
     <section class="catalog-section">
       <h3 class="catalog-title">Rejestr Zapisanych Protokołów</h3>
-      <div id="catalog-list" class="catalog-list">
-        <!-- Generowane dynamicznie w JS -->
-      </div>
+      <div id="catalog-list" class="catalog-list"></div>
     </section>
   </main>
 

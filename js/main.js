@@ -1,7 +1,7 @@
 ﻿document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('protocol-form');
 
-  // --- 0. DATY I AUTOMATYCZNY TERMIN PRZEGLĄDU ---
+  // Daty
   const serviceDateInput = document.getElementById('service-date');
   const nextDateInput = document.getElementById('next-service-date');
 
@@ -28,7 +28,7 @@
     });
   }
 
-  // --- OBSŁUGA OBSZARU RYSOWANIA PODPISÓW (CANVAS) ---
+  // Obsługa Podpisów (Canvas)
   const setupSignatureCanvas = (canvasId) => {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
@@ -88,7 +88,7 @@
     }
   };
 
-  // --- ZAPAMIĘTYWANIE DANYCH FIRMY I INSTALATORA ---
+  // Pamięć podręczna firmowa
   const persistentFields = [
     'company-name', 'company-nip', 'company-address', 'installer-name', 'fgaz-cert'
   ];
@@ -106,7 +106,7 @@
     }
   });
 
-  // --- 1. DYNAMICZNE DODAWANIE / USUWANIE JEDNOSTEK ---
+  // Dynamiczne dodawanie/usuwanie urządzeń
   const indoorContainer = document.getElementById('indoor-units-container');
   const outdoorContainer = document.getElementById('outdoor-units-container');
   const addIndoorBtn = document.getElementById('add-indoor-btn');
@@ -190,7 +190,7 @@
     }
   });
 
-  // --- 2. LOGIKA KATALOGU PROTOKOŁÓW ---
+  // Rejestr protokołów
   const renderCatalog = () => {
     const catalogList = document.getElementById('catalog-list');
     if (!catalogList) return;
@@ -224,7 +224,7 @@
 
   renderCatalog();
 
-  // --- 3. GENEROWANIE DOKUMENTU PDF ORAZ ZAPIS W KATALOGU ---
+  // Generowanie PDF
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -234,7 +234,7 @@
       const protocolType = document.getElementById('protocol-type')?.value || 'Protokół';
       const clientAddress = document.getElementById('client-address')?.value || '';
 
-      // Zapis w katalogu
+      // Zapis do bazy
       const newProtocol = {
         id: Date.now(),
         type: protocolType,
@@ -248,7 +248,7 @@
       localStorage.setItem('klima_protocols_db', JSON.stringify(savedProtocols));
       renderCatalog();
 
-      // Przenoszenie podpisów Canvas do <img>
+      // Przeniesienie podpisów z Canvas do Obrazka
       const clientCanvas = document.getElementById('client-signature');
       const techCanvas = document.getElementById('installer-signature');
       const clientImg = document.getElementById('pdf-sig-client-img');
@@ -274,12 +274,12 @@
       const fileName = `${safeProtocolType}_${safeClientName}_${serviceDate}.pdf`;
 
       const opt = {
-        margin: [8, 8, 8, 8],
-        filename: fileName,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        margin:       [10, 10, 10, 10],
+        filename:     fileName,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
       html2pdf()
